@@ -38,9 +38,9 @@ robotics or programming needed, and the modules can be modeled *in parallel*.
   vary between sellers and revisions; say which one this model represents.
 - *Submit a PR* to `contributions/source-3d-models/<your-github-username>/<part-name>/`:
   - the *STEP* file (primary deliverable) + native CAD source (Fusion/SolidWorks/etc.) if you modeled it
-  - a *photo* of the real part (ideally next to your model / with calipers)
+  - a *photo* of the real part
   - the *source link* (AliExpress/vendor) and *key dimensions*
-  - notes on tolerances and how you measured
+  - notes on tolerances and how you measured - if any
   - announce it in [Project Discussions](https://github.com/makerspet/oomwoo/discussions?discussions_q=)
 - Iterate with review.
 - TBD, expect the RFC to evolve.
