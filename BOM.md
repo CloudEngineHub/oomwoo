@@ -86,10 +86,6 @@ Retail / low-qty prices, INCLUDES shipping, excludes tax. Read [how I calculate 
 | Level sensors | 2-3 | 2-6 | Float/capacitive; clean-low, dirty-full |  |
 | Tubing, fittings, seals, gaskets, fasteners | 1 | 5-10? |  |  |
 | Blower fan | 1 | 3-8? | Ambient air, no heater for now |  |
-
-
-source dock power supply, $15-30 24V 144-500W
-
 | ~PTC heater + thermal fuse + thermistor~ | ~1~ | ~8-20~ | Not in first model. ~Needs redundant thermal cutoff~ |  |
 | Duct, alcove, ramp, housing | 1 | n/a | 3D printed |  |
 | Charging contacts | 2-4 | 2-6? | Gold-plated pogo pins ≥4A; rear-vertical, above water line | |
