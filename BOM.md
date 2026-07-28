@@ -78,12 +78,12 @@ Retail / low-qty prices, INCLUDES shipping, excludes tax. Read [how I calculate 
 | Power supply | 1 | $33 | 400W external | IP67 proof 24V "LED driver" [Amazon](https://www.amazon.com/s?k=24v+led+strip+power+supply+400w) / [eBay](https://www.ebay.com/sch/i.html?_nkw=24v+led+strip+power+supply+400w) |
 |              |   | TBD | Internal      |  |
 | Dock board | 1 | ~30 | DC inlet + fuse + TVS, ESP32 MCU/WiFi, high-side FET/relay for blower, IR homing beacon, push button(s), robot presence detect, charge contacts FET, pump/fan drivers |  |
+| Water level, canisters present sensors | 4 | $0.30 | Hall + magnet, 2x (clean + dirty water) canister present + 2x (clean-low, dirty-full) floats; magnet size TBD | [AliExpress](https://www.aliexpress.us/w/wholesale-neodymium-magnet.html) / [Amazon](https://www.amazon.com/s?k=neodymium+magnet) / [eBay](https://www.ebay.com/sch/i.html?_nkw=neodymium+magnet) |
 | Dust container | 1 | n/a | 3D printed |  |
 | Dock exhaust filter | 1 | 3-8? | Washable/HEPA |  |
 | Suction port + gasket | 1 | 2-5 | Need a good seal |  |
 | Clean + dirty water tanks | 1 | n/a | 3D printed, removable |  |
 | Wash tray | 1 | n/a | 3D printed, removable, w/scrub ribs |  |
-| Level sensors | 2-3 | 2-6 | Float/capacitive; clean-low, dirty-full |  |
 | Tubing, fittings, seals, gaskets, fasteners | 1 | 5-10? |  |  |
 | Blower fan | 1 | 3-8? | Ambient air, no heater for now |  |
 | ~PTC heater + thermal fuse + thermistor~ | ~1~ | ~8-20~ | Not in first model. ~Needs redundant thermal cutoff~ |  |
