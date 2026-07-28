@@ -42,10 +42,10 @@ Reference design images - this is approximately how the finished design will loo
 
 *v0 target: bare-bones build:*
 
-- 3D-printed chassis
-- ROS2 Gazebo sim
-- LiDAR with manual SLAM
-- ROS2 on Raspberry Pi 5 AND/OR ESP32 running micro-ROS with ROS2 on local PC - decision TBD
+- 3D-printed chassis ([browse](https://github.com/makerspet/oomwoo-install))
+- ROS2 Gazebo sim ([install](https://github.com/makerspet/oomwoo-install))
+- Basic cleaning, mapping
+- Raspberry Pi CM4/CM5 running ROS2 ([install](https://github.com/makerspet/oomwoo-install))
 
 Open Source Deliverables:
 
@@ -56,7 +56,7 @@ Open Source Deliverables:
 - [ ] Raspberry Pi [software](https://github.com/makerspet/oomwoo-install)
 - [ ] Motor drivers, sensors [I/O PCB](https://github.com/makerspet/oomwoo-io-board)
 - [ ] I/O PCB [firmware](https://github.com/makerspet/oomwoo-io-firmware)
-- [ ] Build, setup, bringup and troubleshooting [instructions](BUILD_INSTRUCTIONS.md)
+- [ ] Build, setup, bringup and troubleshooting [instructions](docs/BUILD_INSTRUCTIONS.md)
 - [ ] Demo video(s)
 
 ## Contributing
