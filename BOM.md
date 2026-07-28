@@ -78,7 +78,8 @@ Retail / low-qty prices, INCLUDES shipping, excludes tax. Read [how I calculate 
 | Power supply | 1 | $33 | 400W external | IP67 proof 24V "LED driver" [Amazon](https://www.amazon.com/s?k=24v+led+strip+power+supply+400w) / [eBay](https://www.ebay.com/sch/i.html?_nkw=24v+led+strip+power+supply+400w) |
 |              |   | TBD | Internal      |  |
 | Dock board | 1 | ~30 | DC inlet + fuse + TVS, ESP32 MCU/WiFi, high-side FET/relay for blower, IR homing beacon, push button(s), robot presence detect, charge contacts FET, pump/fan drivers |  |
-| Water level, canisters present sensors | 4 | $0.30 | Hall + magnet, 2x (clean + dirty water) canister present + 2x (clean-low, dirty-full) floats; magnet size TBD | [AliExpress](https://www.aliexpress.us/w/wholesale-neodymium-magnet.html) / [Amazon](https://www.amazon.com/s?k=neodymium+magnet) / [eBay](https://www.ebay.com/sch/i.html?_nkw=neodymium+magnet) |
+| Water level, canisters present sensors | 4 | $0.30 | Hall sensors KY-003, 2x (clean + dirty water) canister present + 2x (clean-low, dirty-full) floats | [AliExpress](https://www.aliexpress.us/w/wholesale-ky-003.html) / [Amazon](https://www.amazon.com/s?k=ky+003) / [eBay](https://www.ebay.com/sch/i.html?_nkw=ky+003) |
+|                                        | 4 | $0.10 | Magnets for hall sensors, size TBD | [AliExpress](https://www.aliexpress.us/w/wholesale-neodymium-magnet.html) / [Amazon](https://www.amazon.com/s?k=neodymium+magnet) / [eBay](https://www.ebay.com/sch/i.html?_nkw=neodymium+magnet) |
 | Dust container | 1 | n/a | 3D printed |  |
 | Dock exhaust filter | 1 | 3-8? | Washable/HEPA |  |
 | Suction port + gasket | 1 | 2-5 | Need a good seal |  |
