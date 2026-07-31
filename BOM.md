@@ -63,7 +63,7 @@ Retail / low-qty prices, INCLUDES shipping, excludes tax. Read [how I calculate 
 | ~~Obstacle detection range camera~~ | ~~1~~ | ~~$8–15~~ | ~~VL53L7CX or VL53L7CH, 8x8 obstacle detection (90° FoV)~~ | ~~Expensive if purchased on AliExpress. Sensor IC costs ~$5.50 at DigiKey/Mouser/STMicro. [AliExpress](https://www.aliexpress.us/w/wholesale-VL53L7CX.html) / [Amazon](https://www.amazon.com/s?k=VL53L7CX) / [eBay](https://www.ebay.com/sch/i.html?_nkw=VL53L7CX)~~ |
 | Water pump | 1 | $3–6 | Peristaltic 6V DC ≥50ml/min, tube 2mm ID 4mm OD | Jiayin JYPDM-10 or similar [AliExpress](https://www.aliexpress.us/w/wholesale-water-pump-6v.html) / [Amazon](https://www.amazon.com/s?k=water+pump+6v) / [eBay](https://www.ebay.com/sch/i.html?_nkw=water+pump+6v) |
 | LiDAR tower bumper sensor | 4 | $0.70 | Micro switches | SPDT or similar [AliExpress](https://www.aliexpress.us/w/wholesale-spdt-switches.html) / [Amazon](https://www.amazon.com/s?k=spdt+switches) / [eBay](https://www.ebay.com/sch/i.html?_nkw=spdt+switches) |
-| Speaker + amp, mic, LEDs, buttons | — | 3–8 | | |
+| Speaker | — | 3–8 | | |
 | Custom I/O PCB | 1 | ~40 | STM32 + motor drivers + sensor front-ends | |
 | Wiring, connectors, fasteners, magnets, gaskets, filter, tubing | — | 12–25 | | |
 | Printed parts (filament) | — | 5–15 | you print these yourself | |
