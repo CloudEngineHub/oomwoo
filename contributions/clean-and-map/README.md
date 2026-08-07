@@ -31,6 +31,25 @@ physical robot isn't built yet, this is a *Gazebo simulation*.
 - [Project discussions](https://github.com/makerspet/oomwoo/discussions?discussions_q=)
 - [Discord server](https://discord.gg/3y2JKz5T25)
 
+# Prior art — coverage patterns
+
+Common floor-coverage strategies, simplest to most map-driven
+([overview + trade-offs](https://theroboticsclub.github.io/colab-Sakshay_Mahna/2019-12-22-coverage-algorithms-part-1/)):
+
+- *Random-walk + bump* — early Roomba; statistical coverage, no map. Simple, slow, leaves gaps.
+- *Spiral / backtracking-spiral* — expand outward, backtrack to an unvisited region when the spiral closes.
+- *Boustrophedon (back-and-forth rows)* — the workhorse; *boustrophedon cellular
+  decomposition* splits the free space into cells each covered by simple rows.
+  OOMWOO's map-based sweep already uses this
+  ([oomwoo_coverage](https://github.com/makerspet/oomwoo-ros2-tools)).
+- *Perimeter + interior* — follow walls to clean edges
+  ([floor-care](../floor-care)), then boustrophedon the middle — the standard
+  vacuum combo.
+
+Trade-offs to expect: spirals leave gaps near boundaries; boustrophedon pays a
+turn-overhead cost. Whatever the pattern, this RFC still owns the
+*SLAM-while-cleaning* and *frontier-exploration-to-done* parts below.
+
 # Request for Contribution - Instructions
 
 - reproduce the baseline simulation first
