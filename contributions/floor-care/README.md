@@ -14,6 +14,7 @@ hardware in the [live-robot-bringup RFC](../live-robot-bringup).
 
 # Important References
 - [clean-and-map RFC](../clean-and-map) — coverage cleaning that this refines at edges and surface transitions.
+- [obstacle-avoidance RFC](../obstacle-avoidance) — near-field (below-LiDAR) obstacle detection: the *avoid* neighbor to wall/edge *following*.
 - [urdf-gazebo-sim RFC](../urdf-gazebo-sim) — robot URDF; this package likely needs a *surface sensor* and a *mop lift/lower actuator* modeled.
 - [ROS2 software interfaces](../../docs/SOFTWARE_INTERFACES.md) — shared topic/action/service contract for simulation-first modules.
 - [OOMWOO ROS2 development](https://github.com/makerspet/oomwoo-install) — build OOMWOO ROS2 Docker image(s) with your packages.
