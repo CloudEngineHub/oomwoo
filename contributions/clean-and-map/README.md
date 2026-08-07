@@ -10,18 +10,14 @@ physical robot isn't built yet, this is a *Gazebo simulation*.
 > [placeholder Proscenic M6 Pro](https://makerspet.com/blog/tutorial-connect-robot-vacuum-cleaner-to-ros-2-proscenic-m6-pro/).
 > Say so in the [discussions](https://github.com/makerspet/oomwoo/discussions) so we can coordinate.
 
-> *Scope.* This RFC is only the *first clean from scratch*. Operating on a *saved* map,
-> docking, recovery, floor-surface handling, and cleaning modes are deliberately *out of
-> scope* and live in their own RFCs:
-> [nav-localize](../nav-localize) (navigate / localize / resume a saved map),
-> [dock-cycle](../dock-cycle) (undock / dock / recharge),
-> [recovery-safety](../recovery-safety) (recovery & safety),
-> [floor-care](../floor-care) (wall/edge following, carpet vs hardwood, mop), and
-> [cleaning-jobs](../cleaning-jobs) (modes, zones, job orchestration).
-> Keep this package focused on producing a *complete map* and *full first-pass coverage*;
-> the others build on top of it.
+> *Scope.* This RFC is only the first clean *from scratch*, create a map.
 
-# Important References
+# Related work/pointers - please check
+- [nav-localize](../nav-localize) (navigate / localize / resume a saved map),
+- [dock-cycle](../dock-cycle) (undock / dock / recharge),
+- [recovery-safety](../recovery-safety) (recovery & safety),
+- [floor-care](../floor-care) (wall/edge following, carpet vs hardwood, mop), and
+- [cleaning-jobs](../cleaning-jobs) (modes, zones, job orchestration).
 - [urdf-gazebo-sim RFC](../urdf-gazebo-sim) — provides the robot URDF, the Gazebo world(s), and the *bumper* this package depends on.
 - [ROS2 software interfaces](../../docs/SOFTWARE_INTERFACES.md) — shared topic/action/service contract for simulation-first modules.
 - [m-explore-ros2 (kaiaai fork)](https://github.com/kaiaai/m-explore-ros2) — frontier exploration, tested and working. It maps and explores but does *not* clean — a good starting point to build on.
