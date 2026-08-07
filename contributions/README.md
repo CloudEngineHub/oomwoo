@@ -24,6 +24,7 @@ is the at-a-glance view.
 | [recovery-safety](recovery-safety) | Recovery behaviors & safety | ready to start work |
 | [dock-cycle](dock-cycle) | Undock, dock, recharge & station services | ready to start work |
 | [obstacle-avoidance](obstacle-avoidance) | Near-field camera + ToF avoidance | ready (experimental) |
+| [stair-climbing](stair-climbing) | Multi-floor: stair climbing (drive-in exoskeleton) | exploratory |
 | [control-app](control-app) | Control app & UX | ready (design track) |
 | [live-robot-bringup](live-robot-bringup) | Live robot bring-up & validation | ready to start work |
 | [health-monitor](health-monitor) | Stack health monitor & software watchdog | design-first, ready |
