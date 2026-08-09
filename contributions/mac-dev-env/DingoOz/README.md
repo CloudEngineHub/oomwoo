@@ -1,5 +1,7 @@
 # pixi ROS 2 (Lyrical) dev + sim setup — by @DingoOz
 
+> Discord message verbatim copy
+
 A reproducible dev setup for OOMWOO: a simulated robot you can drive around in
 Gazebo, running on **ROS 2 Lyrical**, installed with [pixi](https://pixi.sh).
 
@@ -21,8 +23,7 @@ as well as Linux.
 
 ## Platforms
 
-Works on **Apple Silicon Macs** (this RFC's focus), and also **Linux** and
-**Raspberry Pi 5**.
+Works on **Apple Silicon Macs** (this RFC's focus), and also **Linux** and **Raspberry Pi 5**.
 
 ## Setup
 
