@@ -21,7 +21,8 @@ as well as Linux.
 
 ## Platforms
 
-Works on **Linux**, **Raspberry Pi 5**, and **Apple Silicon Macs**.
+Works on **Apple Silicon Macs** (this RFC's focus), and also **Linux** and
+**Raspberry Pi 5**.
 
 ## Setup
 
@@ -58,8 +59,8 @@ drive.
 ## What would help
 
 Still early and on a branch. If you give it a go, report whether it comes up
-cleanly on your machine — **especially on a Pi 5 or a Mac** — with your platform,
-OS version, and anything you had to change. Post results in
+cleanly on your machine — **especially on a Mac (Apple Silicon)** — with your
+macOS version + chip (or platform), and anything you had to change. Post results in
 [Project Discussions](https://github.com/makerspet/oomwoo/discussions) or
 [Discord](https://discord.gg/3y2JKz5T25).
 
