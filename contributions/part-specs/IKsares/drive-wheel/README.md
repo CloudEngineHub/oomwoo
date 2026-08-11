@@ -100,6 +100,35 @@ segments the resistance varies with shaft angle, and the minimum-resistance posi
 that sets the true peak. That sweep is still open (§9), and it is the only thing that could
 push this motor past the driver's rating.
 
+### No-load current — VERIFIED
+
+**0.13 A at 12 V**, shaft free, motor out of the gearbox.
+
+That is 1.56 W drawn at no load. Splitting it with the constants above:
+
+| Term | Value |
+|---|---|
+| Copper loss `I²R` | 0.09 W |
+| Brush drop loss `I·V₀` | 0.25 W |
+| **Mechanical + iron losses** | **≈1.23 W** (bearings, brush friction, core) |
+| Back-EMF at no-load speed | ≈9.4 V |
+
+Stall-to-no-load current ratio ≈ 15, normal for a small brushed motor in good condition — a
+worn or binding unit would show a higher no-load draw.
+
+> The back-EMF figure extrapolates the brush drop *below* the measured range (the fit spans
+> 0.27–1 A). Brush drop tends to fall at low current, so the real back-EMF is 9.4 V or a little
+> more, and the mechanical losses correspondingly a little higher.
+
+**One measurement closes the motor model.** With the no-load *speed*, back-EMF gives the motor
+constant `Ke = Kt`, and from there stall torque, wheel torque through the 65.36 : 1 train, and
+the full torque-speed curve — all of which `part-specs` asks for and none of which is
+established for this part. And the speed is measurable without a tachometer: the encoder puts
+out 4 cycles per motor revolution (§4), so **a multimeter's frequency range on the blue wire
+gives `rpm = f/4 × 60`** while the motor spins at 12 V. The Hall needs its own 3.3 V supply
+with grounds tied — a couple of AA cells will do it. **Do not feed the Hall from the 12 V
+motor rail** (§6).
+
 > **An ohmmeter will not reproduce these numbers — don't try to check them that way.** At the
 > sub-milliamp test current of a multimeter's resistance range, the reading is dominated by the
 > brush-to-commutator contact and its oxide film, not by the copper. On this motor an ohmmeter
@@ -458,7 +487,7 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 | Wheel diameter | ✅ 71.5 mm OD |
 | Rated voltage | ✅ 12 V (can marking) |
 | Max voltage | ❌ not established |
-| Current (no-load & stall) | ⚠️ stall ✅ 2.93 A at 16.8 V (§1, winding 5.08 Ω + 1.91 V brush drop); no-load current not measured |
+| Current (no-load & stall) | ✅ no-load 0.13 A at 12 V; stall 2.93 A at 16.8 V (winding 5.08 Ω + 1.91 V brush drop) — §1 |
 | Torque | ❌ not measured |
 | Max / rated wheel speed | ❌ not measured |
 | Cable lengths | ✅ 220 mm total, 155 mm past the cable guide |
@@ -476,14 +505,22 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
       minimum-resistance angle, then repeat the three-point measurement there. That sets the
       real peak draw, and it is the one result that could push this motor past the driver's
       3.6 A rating (§1)
-- [ ] No-load current at 12 V (needs the shaft free)
+- [ ] **No-load speed** — measurable with a multimeter's frequency range on the encoder output
+      (`rpm = f/4 × 60`). It closes the motor model: Ke = Kt, stall torque, wheel torque and the
+      torque-speed curve all follow from it (§1)
 - [ ] Wheel-drop switch: which mechanical state presses the lever — needs the module
       assembled. Everything electrical about it is now measured (§5)
 - [ ] Confirm the connector is genuine JST ZH rather than a pitch-compatible clone (no
       manufacturer marking found; matters for sourcing the mating part, not for the pinout)
 - [ ] **Confirm the pole count with a scope or frequency counter** — the hand count in §4 is
       a lower bound, and §7 cannot separate 4 pole pairs from 8
-- [ ] Scope captures of the encoder output under load (noise, edge quality)
+- [ ] Scope captures of the encoder output under load (noise, edge quality), and whether the
+      100 nF / RC measures in §6 are actually needed on this unit
+- [ ] **Mark-space ratio of the encoder pulse.** §4 offers both-edge counting to double
+      resolution, which silently assumes ~50% duty. If the magnetic ring is asymmetric, the
+      intervals alternate long-short and every other tick lands off — harmless for distance
+      totals, but it injects a fixed jitter into velocity estimates and into any PID that
+      differentiates them. Worth one capture before firmware relies on it
 - [ ] Bench roll test (edges over a measured distance) to close the residual ~4% in §7
 - [ ] Confirm whether an OEM Roborock module carries the same 4-pole-pair ring and 65.36 : 1
       train as this aftermarket one
