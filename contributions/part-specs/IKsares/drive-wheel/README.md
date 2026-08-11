@@ -119,10 +119,18 @@ Teeth counted on the opened gearbox.
 **Total reduction i = (36·42·34·24) / (11·13·12·11) = 1 233 792 / 18 876 ≈ 65.36 : 1**
 (motor revolutions per wheel revolution).
 
-## 4. Encoder resolution and odometry — VERIFIED
+## 4. Encoder resolution and odometry — MEASURED, with a caveat
 
 Base measurement: **4 rising edges per motor revolution**, i.e. 4 pulse cycles per
 revolution → the magnetic ring has **4 pole pairs (8 poles)**.
+
+**Method, and its limits.** The motor was out of the gearbox and its shaft turned slowly by
+hand while watching the blue line toggle on a multimeter — so this counts edges per *motor*
+revolution, not per wheel revolution. **No oscilloscope and no frequency counter were used.**
+A multimeter's refresh rate is slow, so this is only reliable if the shaft is turned slowly
+enough that no transition is missed. If any were missed, **4 is a lower bound** and the real
+count would be a multiple of it — 8 pole pairs would halve every distance below. The figure
+is consistent with the independent cross-check in §7, but a scope capture would settle it.
 
 Fixed data used below: gearbox reduction 65.36 : 1; wheel outer diameter **71.5 mm**
 (measured with calipers); wheel circumference π × 71.5 = **224.6 mm**.
@@ -210,7 +218,7 @@ count *"speculative without physical inspection"*. This document supplies both m
 | Quantity | OsakaTX (derived) | Measured here | How |
 |---|---|---|---|
 | Gearbox ratio | ~190 : 1 | **65.36 : 1** | teeth counted, 4 spur stages |
-| Magnetic ring | ~32 poles (speculative) | **8 poles (4 pole pairs)** | edges counted per motor revolution |
+| Magnetic ring | ~32 poles (speculative) | **8 poles (4 pole pairs)** | edges counted by hand per motor revolution, multimeter — see §4 |
 | Wheel diameter | 65 mm, from alvarosamudio's simulation URDF | **71.5 mm** | calipers, on the physical wheel |
 | Motor | Nidec 20N704RC70, 14.4 V (catalogue, flagged "in development") | **CDM GM-RS360-16248, 12 V** | read off the can |
 
@@ -250,9 +258,18 @@ two intermediate derivations:
   0.69 m/s, making 0.3 m/s a deliberate software limit rather than a mechanical ceiling.
 
 Residual ~4% could be the aftermarket module differing from the OEM one, the effective
-rolling diameter under load, or the calibration itself. **Suggested check:** roll a wheel a
-measured distance (e.g. 2 m) on the bench and count edges — that settles ticks/m end to end,
-independently of every derivation above.
+rolling diameter under load, or the calibration itself.
+
+> **What this cross-check cannot distinguish.** It only pins down the product — **16 counts
+> per motor revolution**. Two hypotheses produce it and this arithmetic cannot tell them
+> apart: 4 pole pairs with the GD32's 4× decoding (assumed above), or 8 pole pairs with plain
+> both-edge counting. The hand count in §4 favours the first, but it is a lower bound, so the
+> second is not excluded — and it would halve every distance-per-edge figure in §4.
+
+**Suggested checks:** put a scope on the blue line and turn the shaft one revolution — that
+resolves the pole count directly. Separately, roll a wheel a measured distance (e.g. 2 m) on
+the bench and count edges, which settles ticks/m end to end, independently of every
+derivation above.
 
 ### Note for the I/O board design
 
@@ -273,7 +290,7 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 |---|---|
 | Motor model | ✅ `CDM GM-RS360-16248` |
 | Motor/assembly datasheet | ❌ none published for this variant |
-| Encoder type + PPR | ✅ single-channel Hall, 4 rising edges/motor rev (4 pole pairs) |
+| Encoder type + PPR | ⚠️ single-channel Hall ✅; 4 rising edges/motor rev counted by hand — lower bound, see §4 |
 | Gearbox ratio | ✅ 65.36 : 1, teeth counted |
 | Wheel diameter | ✅ 71.5 mm OD |
 | Rated voltage | ✅ 12 V (can marking) |
@@ -295,6 +312,8 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 - [ ] Winding resistance, no-load current @ 12 V, stall current
 - [ ] Wheel-drop sensor pinout and polarity (§5)
 - [ ] Module connector model, pin order and cable length
+- [ ] **Confirm the pole count with a scope or frequency counter** — the hand count in §4 is
+      a lower bound, and §7 cannot separate 4 pole pairs from 8
 - [ ] Scope captures of the encoder output under load (noise, edge quality)
 - [ ] Bench roll test (edges over a measured distance) to close the residual ~4% in §7
 - [ ] Confirm whether an OEM Roborock module carries the same 4-pole-pair ring and 65.36 : 1
