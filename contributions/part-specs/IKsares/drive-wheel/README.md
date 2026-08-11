@@ -75,6 +75,30 @@ orange; the function mapping is the one in the table above.
 The motor winding is **galvanically isolated** from the sensor circuit (no continuity
 between the red/black pair and any of the three sensor wires).
 
+### Module connector and harness — VERIFIED
+
+All seven conductors terminate in a **single 7-way connector**.
+
+| Pin | Wire | Function |
+|---|---|---|
+| 1 | wheel-drop switch | dry contact, no polarity |
+| 2 | wheel-drop switch | dry contact, no polarity |
+| 3 | orange | Hall VCC |
+| 4 | blue | Hall OUT |
+| 5 | brown | Hall GND |
+| 6 | black | motor terminal |
+| 7 | red | motor terminal |
+
+The wheel-drop pair is at one end and the motor pair at the other, with the three Hall
+conductors between them. Their colour depends on which side the module is from — see §5.
+
+| Harness | Value |
+|---|---|
+| Conductors | 7 |
+| **Total length** | **220 mm** |
+| **Free length past the cable guide** | **155 mm** — the bundle is threaded through a moulded guide on the module, so this is the length a harness design can actually work with |
+| Connector model | **Not identified** — pitch not yet measured, so the JST family is still open (§9) |
+
 ### How it was verified
 
 1. **Power circuit.** Continuity confirmed between red/black and the two brush tabs on the
@@ -162,20 +186,24 @@ per wheel.
 | Markings | `MG01-13` / `5P30-M55-W8W` | recorded |
 | Manufacturer | Unknown — neither marking resolves to a public datasheet (OEM part) | — |
 | Type | **Mechanical switch** (not an optical or Hall sensor) | confirmed on the part |
-| Wiring | **Two wires, both brown** | confirmed |
+| Wiring | Two wires, both the same colour — **brown on the left module, grey on the right** | confirmed on both |
 | Polarity | None — a dry contact, so the two wires are electrically interchangeable | — |
 | NO / NC at rest | Not yet determined | open |
 
-> ⚠️ **Three brown wires, three different functions.** In this module brown is the Hall
-> sensor GND (§2) *and* both wheel-drop switch wires. Colour cannot identify a conductor
-> here — identify by connector position or by continuity, never by colour. This is a real
-> assembly hazard: connecting a switch wire where the Hall ground belongs shorts nothing but
-> leaves the sensor unreferenced and the encoder dead, with no visible clue why.
+**The switch wire colour encodes the side.** Both modules of the pair were checked: the left
+one has the pair in brown, the right one in grey. That is worth knowing — it is the only
+external marking that tells the two modules apart once they are off the robot.
 
-Note this also differs from [Scowt's](../../Scowt/DriveWheel.md) description, which has the
-limit switch on **two grey wires**. Either the colour varies between OEM and aftermarket
-batches, or between production runs — either way, harness documentation should not key off
-wire colour for this switch.
+It also resolves what looked like a contradiction with [Scowt](../../Scowt/DriveWheel.md),
+who describes the limit switch on **two grey wires**: that matches the right-hand module.
+Both descriptions are correct, for different sides.
+
+> ⚠️ **On the left module, three brown wires carry three different functions** — the Hall
+> sensor GND (§2) plus both wheel-drop switch wires. There, colour cannot identify a
+> conductor: go by connector position or by continuity. The failure is silent — connecting a
+> switch wire where the Hall ground belongs shorts nothing, it just leaves the sensor
+> unreferenced and the encoder dead with no visible cause. The right module does not have
+> this ambiguity (one brown, two grey).
 
 ### Still open
 
@@ -219,19 +247,29 @@ there is **confirmed correct on this physical unit**:
 
 | Scowt (tentative) | This unit (verified) | Result |
 |---|---|---|
-| Encoder 5 V, orange | orange = Hall VCC | ✅ confirmed (verified at 3.3 V) |
-| Encoder Signal, blue | blue = Hall OUT | ✅ confirmed |
-| Encoder Ground, brown | brown = Hall GND | ✅ confirmed |
-| Motor power, black / red | red, black = winding | ✅ confirmed |
-| Hall-effect encoder | Hall sensor + magnetic ring | ✅ confirmed |
+| pin 1 — limit switch | pin 1 — wheel-drop switch | ✅ |
+| pin 2 — limit switch | pin 2 — wheel-drop switch | ✅ |
+| pin 3 — encoder 5 V, orange | pin 3 — orange, Hall VCC | ✅ (verified working at 3.3 V) |
+| pin 4 — encoder signal, blue | pin 4 — blue, Hall OUT | ✅ |
+| pin 5 — encoder ground, brown | pin 5 — brown, Hall GND | ✅ |
+| pin 6 — motor power, black | pin 6 — black, motor terminal | ✅ |
+| pin 7 — motor power, red | pin 7 — red, motor terminal | ✅ |
+| Hall-effect encoder | Hall sensor + magnetic ring | ✅ |
+| Cable ~250 mm ("estimate only") | **220 mm** total, 155 mm past the cable guide | ✅ close, now measured |
+| Limit switch on grey wires | grey on the right module, brown on the left | ✅ correct for the right side (§5) |
 
-One thing does not match: Scowt has the limit switch on **two grey wires**, while on this unit
-both are brown (§5). Colour is not a reliable identifier for that switch across variants.
+**The whole 7-pin pinout is confirmed, pin for pin.** It was inferred from photographs and a
+StackExchange thread, and it turns out to be right — including the pin order, which nothing in
+that thread could have established.
 
-Still open from that document: connector model (JST family/pitch) and cable length. Note that
-the encoder being single-channel — verified here — rules out the 6-pin `HALL_DIR` pinout that
-[io-pcb](../../../io-pcb/README.md) currently references from the AlieksieievYurii schematic,
-at least for this module.
+Still open from that document: the connector model. Scowt's "JST, might be XH but not certain"
+is unresolved here too — the pitch has not been measured (§9).
+
+This also settles a fork in [io-pcb](../../../io-pcb/README.md), which references the
+AlieksieievYurii 6-pin `JST PH2.0` pinout with a `HALL_DIR` line and asks for it to be
+verified against a sourced module before layout. That pinout does not describe this module:
+there are **7 conductors, not 6**, and the encoder has a single channel, so there is no
+`HALL_DIR` to wire.
 
 ### Closes two open items in [OsakaTX's spec sheets](../../OsakaTX/vacuumtiger-verified-specs.md)
 
@@ -323,9 +361,9 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 | Current (no-load & stall) | ❌ not measured |
 | Torque | ❌ not measured |
 | Max / rated wheel speed | ❌ not measured |
-| Cable lengths | ❌ not recorded |
-| Connector models (both ends) | ❌ not recorded |
-| Full connector + motor pinouts | ⚠️ motor-side 5-wire pinout ✅ verified; module connector pinout not mapped |
+| Cable lengths | ✅ 220 mm total, 155 mm past the cable guide |
+| Connector models (both ends) | ⚠️ 7-way, single connector; JST family/pitch not yet measured |
+| Full connector + motor pinouts | ✅ both — motor-side 5-wire and the 7-pin module connector, pin for pin |
 | Wheel-drop sensor model + pinout | ⚠️ mechanical switch confirmed, 2 brown wires, no polarity; NO/NC and mechanical polarity open — §5 |
 | Signal waveforms | ❌ no scope captures (multimeter only) |
 | Assembly weight | ❌ not measured |
@@ -336,7 +374,9 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 - [ ] Hall IC part number — requires lifting the PCB, the marked face is hidden
 - [ ] Winding resistance, no-load current @ 12 V, stall current
 - [ ] Wheel-drop switch: NO/NC at rest, and which mechanical state means wheel retracted (§5)
-- [ ] Module connector model, pin order and cable length
+- [ ] Connector model: measure the **pitch** (2.5 mm = JST XH, 2.0 = PH, 1.5 = ZH,
+      1.25 = GH) and state the **orientation reference** for pin 1 (which face the retention
+      latch is on), so the pin order in §2 is unambiguous to wire against
 - [ ] **Confirm the pole count with a scope or frequency counter** — the hand count in §4 is
       a lower bound, and §7 cannot separate 4 pole pairs from 8
 - [ ] Scope captures of the encoder output under load (noise, edge quality)
