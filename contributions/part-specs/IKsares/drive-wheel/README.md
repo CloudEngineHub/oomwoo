@@ -200,29 +200,70 @@ there is **confirmed correct on this physical unit**:
 Still open from that document: connector model (JST family/pitch), cable length, and the
 two limit-switch pins — see §5.
 
-### Discrepancy with [OsakaTX/io-board-wheel-connector-and-caster.md](../../OsakaTX/io-board-wheel-connector-and-caster.md) §5
+### Closes two open items in [OsakaTX's spec sheets](../../OsakaTX/vacuumtiger-verified-specs.md)
 
-That document lists gearbox ratio and encoder resolution as resolved, derived from
-VacuumTiger calibration constants: **~190 : 1** and **~228 raw PPR / 4464 ticks/m**. The
-direct measurements here disagree:
+OsakaTX's drive wheel figures are derived — from the VacuumTiger firmware's calibration
+constants, a Nidec catalogue entry, and merged PRs — with the physical work explicitly listed
+as pending: *"Exact gearbox ratio via tooth count — Open gearbox, count teeth"*, and the pole
+count *"speculative without physical inspection"*. This document supplies both measurements.
 
-| Quantity | Derived from VacuumTiger | Measured here | Method here |
+| Quantity | OsakaTX (derived) | Measured here | How |
 |---|---|---|---|
-| Gearbox ratio | ~190 : 1 | **65.36 : 1** | gear teeth counted, 4 stages |
-| Ticks per metre | 4464 | **1164** (rising) / **2328** (both edges) | edges/motor-rev counted × ratio ÷ circumference |
+| Gearbox ratio | ~190 : 1 | **65.36 : 1** | teeth counted, 4 spur stages |
+| Magnetic ring | ~32 poles (speculative) | **8 poles (4 pole pairs)** | edges counted per motor revolution |
+| Wheel diameter | 65 mm, from alvarosamudio's simulation URDF | **71.5 mm** | measured on the physical wheel |
+| Motor | Nidec 20N704RC70, 14.4 V (catalogue, flagged "in development") | **CDM GM-RS360-16248, 12 V** | read off the can |
 
-I can't reconcile the two from here, and I'm not claiming the calibration figures are wrong
-— they may describe a different wheel module (VacuumTiger targets a complete Roborock robot,
-possibly a different model and wheel diameter), or fold in a firmware-side multiplier. What I
-can say is that the numbers above come from counting physical teeth and physical edges on
-this unit.
+The motor difference may be genuine: this is an aftermarket module, and OsakaTX's own note
+warns that "the actual motor used in production Roborock wheels may differ from the catalogue
+entry".
 
-**Suggested tiebreaker:** roll a wheel a measured distance (e.g. 2 m) on the bench and count
-edges. That resolves ticks/m end to end, independently of both derivations.
+### Reconciling with `ticks_per_meter = 4464`
 
-Also relevant to the I/O board design: that document has the OOMWOO connector supplying the
-encoder at **+5 V** (`VCC-5V-WHEEL`). This sensor is confirmed working at 3.3 V and draws
-≈2.5 mA; 5 V remains untested here, and the IC's absolute maximum is unknown.
+The one hard number on that side is `ticks_per_meter = 4464.0`, empirically calibrated on a
+real robot and consistent across several VacuumTiger source files. At first glance it looks
+incompatible with the measurements here (1164 ticks/m counting rising edges). It isn't — the
+gap is the GD32's decoding, which OsakaTX documents: the hardware timer performs **4× edge
+counting** on the single pulse train.
+
+Applying that 4× to the measured mechanics:
+
+```
+4 cycles/motor rev  ×  4 (GD32 decoding)      =  16 ticks/motor rev
+16  ×  65.36 (measured ratio)                 =  1046 ticks/wheel rev
+1046  /  0.2246 m (π × 71.5 mm)               =  4656 ticks/m
+```
+
+**4656 vs the calibrated 4464 — within 4%.** The same correction runs the other way: taking
+4464 ticks/m and the real 71.5 mm wheel gives 1003 ticks/wheel rev → 251 raw cycles/wheel rev,
+against the 261.5 measured here. Again ~4%.
+
+So the calibrated constant and the physical measurements agree. What does not survive are the
+two intermediate derivations:
+
+- **~228 PPR and ~32 poles** — the pole count came from dividing by a 65 mm wheel diameter
+  taken from the simulation URDF. With the measured 71.5 mm the arithmetic lands on the
+  8-pole ring counted here, no speculation needed.
+- **~190 : 1** — derived by assuming the configured `max_linear_speed = 0.3 m/s` corresponds
+  to the motor at no-load speed. It need not: with the measured 65.36 : 1 and an RS-360-class
+  no-load figure (order of magnitude ≈12 000 rpm at 12 V), the wheel would top out near
+  0.69 m/s, making 0.3 m/s a deliberate software limit rather than a mechanical ceiling.
+
+Residual ~4% could be the aftermarket module differing from the OEM one, the effective
+rolling diameter under load, or the calibration itself. **Suggested check:** roll a wheel a
+measured distance (e.g. 2 m) on the bench and count edges — that settles ticks/m end to end,
+independently of every derivation above.
+
+### Note for the I/O board design
+
+[OsakaTX/io-board-wheel-connector-and-caster.md](../../OsakaTX/io-board-wheel-connector-and-caster.md)
+has the OOMWOO wheel connector supplying the encoder at **+5 V** (`VCC-5V-WHEEL`). This sensor
+is confirmed working at 3.3 V drawing ≈2.5 mA; 5 V remains untested here, and the Hall IC's
+absolute maximum is unknown.
+
+Also worth carrying into firmware: VacuumTiger resolves the single-channel direction ambiguity
+with the **IMU gyro**, not with the commanded motor polarity. That is a more robust answer than
+the one in §4 and is worth reusing.
 
 ## 8. Coverage against the part-specs checklist
 
@@ -255,7 +296,9 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 - [ ] Wheel-drop sensor pinout and polarity (§5)
 - [ ] Module connector model, pin order and cable length
 - [ ] Scope captures of the encoder output under load (noise, edge quality)
-- [ ] Reconcile the ratio/ticks-per-metre discrepancy in §7
+- [ ] Bench roll test (edges over a measured distance) to close the residual ~4% in §7
+- [ ] Confirm whether an OEM Roborock module carries the same 4-pole-pair ring and 65.36 : 1
+      train as this aftermarket one
 
 ---
 
