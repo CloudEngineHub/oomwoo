@@ -151,29 +151,49 @@ Firmware can count rising edges only (0.859 mm/edge) or both edges to double the
 > applies to the motor. Closed-loop position control or feedback-based direction sensing
 > would need a second sensor in quadrature.
 
-## 5. Wheel-drop sensor — NOT characterized
+## 5. Wheel-drop sensor — PARTIALLY characterized
 
-A second sensor sits in the module's wire bundle, presumably the wheel-drop (wheel-lift)
-detector that [SPEC.md](https://github.com/makerspet/oomwoo-one-cad/blob/main/docs/SPEC.md)
-expects one of per wheel.
+A second sensor sits in the module's wire bundle: the wheel-drop (wheel-lift) detector that
+[SPEC.md](https://github.com/makerspet/oomwoo-one-cad/blob/main/docs/SPEC.md) expects one of
+per wheel.
 
-| Field | Value |
-|---|---|
-| Markings | `MG01-13` / `5P30-M55-W8W` |
-| Manufacturer | Unknown — neither marking resolves to a public datasheet (OEM part) |
-| Type | Presumed snap-action microswitch — **to confirm** |
+| Field | Value | Status |
+|---|---|---|
+| Markings | `MG01-13` / `5P30-M55-W8W` | recorded |
+| Manufacturer | Unknown — neither marking resolves to a public datasheet (OEM part) | — |
+| Type | **Mechanical switch** (not an optical or Hall sensor) | confirmed on the part |
+| Wiring | **Two wires, both brown** | confirmed |
+| Polarity | None — a dry contact, so the two wires are electrically interchangeable | — |
+| NO / NC at rest | Not yet determined | open |
 
-Open, and doable with a multimeter alone (no power needed):
+> ⚠️ **Three brown wires, three different functions.** In this module brown is the Hall
+> sensor GND (§2) *and* both wheel-drop switch wires. Colour cannot identify a conductor
+> here — identify by connector position or by continuity, never by colour. This is a real
+> assembly hazard: connecting a switch wire where the Hall ground belongs shorts nothing but
+> leaves the sensor unreferenced and the encoder dead, with no visible clue why.
 
-- [ ] Confirm it is a mechanical switch — audible/tactile click, continuity changes when the
-      actuator is pressed
-- [ ] Map the terminals: COM / NO / NC (3 terminals) or which contact is wired (2 wires);
-      record the wire colours
-- [ ] Record which state means *wheel retracted* (robot on the floor, actuator pressed) vs
-      *wheel dropped* — firmware needs this polarity
-- [ ] Note where each marking is printed (switch body vs harness/connector — `5P30-M55-W8W`
-      may be a harness code rather than the switch model)
+Note this also differs from [Scowt's](../../Scowt/DriveWheel.md) description, which has the
+limit switch on **two grey wires**. Either the colour varies between OEM and aftermarket
+batches, or between production runs — either way, harness documentation should not key off
+wire colour for this switch.
+
+### Still open
+
+Measurable now, even with the switch out of the module (multimeter, no power):
+
+- [ ] **NO or NC at rest** — press the actuator and watch continuity. One minute of work, and
+      it is half of what the firmware needs
 - [ ] Contact rating, if printed on the body
+- [ ] Where each marking is printed (switch body vs harness/connector — `5P30-M55-W8W` may be
+      a harness code rather than the switch model)
+
+Needs the module assembled, or at least the switch offered up to its seat:
+
+- [ ] **Which mechanical state means *wheel retracted*** (robot resting on the floor, wheel
+      pushed up into the body) vs *wheel dropped* (robot lifted, spring extends the wheel).
+      Firmware needs this to fail safe — a wheel-drop that reads inverted means the robot
+      stops on the floor and drives happily while held in the air
+- [ ] What actuates it — typically the suspension arm as the wheel travels up
 
 ## 6. Integration requirements
 
@@ -205,8 +225,13 @@ there is **confirmed correct on this physical unit**:
 | Motor power, black / red | red, black = winding | ✅ confirmed |
 | Hall-effect encoder | Hall sensor + magnetic ring | ✅ confirmed |
 
-Still open from that document: connector model (JST family/pitch), cable length, and the
-two limit-switch pins — see §5.
+One thing does not match: Scowt has the limit switch on **two grey wires**, while on this unit
+both are brown (§5). Colour is not a reliable identifier for that switch across variants.
+
+Still open from that document: connector model (JST family/pitch) and cable length. Note that
+the encoder being single-channel — verified here — rules out the 6-pin `HALL_DIR` pinout that
+[io-pcb](../../../io-pcb/README.md) currently references from the AlieksieievYurii schematic,
+at least for this module.
 
 ### Closes two open items in [OsakaTX's spec sheets](../../OsakaTX/vacuumtiger-verified-specs.md)
 
@@ -301,7 +326,7 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 | Cable lengths | ❌ not recorded |
 | Connector models (both ends) | ❌ not recorded |
 | Full connector + motor pinouts | ⚠️ motor-side 5-wire pinout ✅ verified; module connector pinout not mapped |
-| Wheel-drop sensor model + pinout | ⚠️ markings recorded, not characterized — §5 |
+| Wheel-drop sensor model + pinout | ⚠️ mechanical switch confirmed, 2 brown wires, no polarity; NO/NC and mechanical polarity open — §5 |
 | Signal waveforms | ❌ no scope captures (multimeter only) |
 | Assembly weight | ❌ not measured |
 
@@ -310,7 +335,7 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 - [ ] Motor can dimensions (diameter, body length, shaft diameter) — also needed for CAD
 - [ ] Hall IC part number — requires lifting the PCB, the marked face is hidden
 - [ ] Winding resistance, no-load current @ 12 V, stall current
-- [ ] Wheel-drop sensor pinout and polarity (§5)
+- [ ] Wheel-drop switch: NO/NC at rest, and which mechanical state means wheel retracted (§5)
 - [ ] Module connector model, pin order and cable length
 - [ ] **Confirm the pole count with a scope or frequency counter** — the hand count in §4 is
       a lower bound, and §7 cannot separate 4 pole pairs from 8
