@@ -125,7 +125,7 @@ Base measurement: **4 rising edges per motor revolution**, i.e. 4 pulse cycles p
 revolution → the magnetic ring has **4 pole pairs (8 poles)**.
 
 Fixed data used below: gearbox reduction 65.36 : 1; wheel outer diameter **71.5 mm**
-(measured); wheel circumference π × 71.5 = **224.6 mm**.
+(measured with calipers); wheel circumference π × 71.5 = **224.6 mm**.
 
 | Quantity | Rising edges only | Both edges (rising + falling) |
 |---|---|---|
@@ -211,7 +211,7 @@ count *"speculative without physical inspection"*. This document supplies both m
 |---|---|---|---|
 | Gearbox ratio | ~190 : 1 | **65.36 : 1** | teeth counted, 4 spur stages |
 | Magnetic ring | ~32 poles (speculative) | **8 poles (4 pole pairs)** | edges counted per motor revolution |
-| Wheel diameter | 65 mm, from alvarosamudio's simulation URDF | **71.5 mm** | measured on the physical wheel |
+| Wheel diameter | 65 mm, from alvarosamudio's simulation URDF | **71.5 mm** | calipers, on the physical wheel |
 | Motor | Nidec 20N704RC70, 14.4 V (catalogue, flagged "in development") | **CDM GM-RS360-16248, 12 V** | read off the can |
 
 The motor difference may be genuine: this is an aftermarket module, and OsakaTX's own note
