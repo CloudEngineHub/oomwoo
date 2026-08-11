@@ -79,6 +79,9 @@ between the red/black pair and any of the three sensor wires).
 
 All seven conductors terminate in a **single 7-way connector**.
 
+> **Orientation reference:** pins numbered left to right **viewed from the wire side, with the
+> retention latches facing up** — the view in the photo below.
+
 | Pin | Wire | Function |
 |---|---|---|
 | 1 | wheel-drop switch | dry contact, no polarity |
@@ -95,9 +98,20 @@ conductors between them. Their colour depends on which side the module is from �
 | Harness | Value |
 |---|---|
 | Conductors | 7 |
+| **Pitch** | **1.5 mm** — measured 9.0 mm centre-to-centre from pin 1 to pin 7, ÷6 |
+| **Connector family** | **JST ZH 1.5 mm**, or a pitch-compatible clone — no manufacturer marking is visible, so the pitch is what is verified, not the brand |
 | **Total length** | **220 mm** |
 | **Free length past the cable guide** | **155 mm** — the bundle is threaded through a moulded guide on the module, so this is the length a harness design can actually work with |
-| Connector model | **Not identified** — pitch not yet measured, so the JST family is still open (§9) |
+
+![Right-hand module: 7-way connector (grey, grey, orange, blue, brown, black, red) and the wheel-drop microswitch on its carrier PCB](right-module-connector-and-switch.jpg)
+
+> **1.5 mm is the same pitch the I/O board already uses.** The current OOMWOO schematic
+> specifies a board-side 5-pin JST ZH 1.5 mm for the wheel
+> ([OsakaTX](../../OsakaTX/io-board-wheel-connector-and-caster.md), footprint
+> `CONN-SMD_5P-P1.50_ZX-ZH1.5-5PWT`). The module side is the same family and pitch — the only
+> mismatch is the way count, 7 vs 5, because the module brings motor power and the wheel-drop
+> pair out on the same connector. This also rules out Scowt's tentative "might be XH", which
+> would be 2.5 mm.
 
 ### How it was verified
 
@@ -185,10 +199,18 @@ per wheel.
 |---|---|---|
 | Markings | `MG01-13` / `5P30-M55-W8W` | recorded |
 | Manufacturer | Unknown — neither marking resolves to a public datasheet (OEM part) | — |
-| Type | **Mechanical switch** (not an optical or Hall sensor) | confirmed on the part |
+| Type | **Mechanical switch** (not an optical or Hall sensor), snap-action body with a lever | confirmed on the part |
+| Mounting | Soldered to a **small carrier PCB**, not wired directly; the two harness wires land on that PCB | confirmed |
+| Carrier PCB silkscreen | **`COM`** and **`KEY1`** | read off the photo |
 | Wiring | Two wires, both the same colour — **brown on the left module, grey on the right** | confirmed on both |
 | Polarity | None — a dry contact, so the two wires are electrically interchangeable | — |
 | NO / NC at rest | Not yet determined | open |
+
+The switch sits on a carrier PCB whose silkscreen labels the two nets `COM` and `KEY1`, so one
+wire is the common and the other the switched contact. Which harness wire lands on which pad
+is not established here — with two identical-coloured wires, that needs a continuity check
+rather than a photo. Note also that `MG01-13` may be the **carrier PCB's** designation rather
+than the switch model, which would explain why neither marking resolves publicly.
 
 **The switch wire colour encodes the side.** Both modules of the pair were checked: the left
 one has the pair in brown, the right one in grey. That is worth knowing — it is the only
@@ -211,9 +233,9 @@ Measurable now, even with the switch out of the module (multimeter, no power):
 
 - [ ] **NO or NC at rest** — press the actuator and watch continuity. One minute of work, and
       it is half of what the firmware needs
+- [ ] Which of the two wires lands on `COM` and which on `KEY1` (continuity to the pads)
 - [ ] Contact rating, if printed on the body
-- [ ] Where each marking is printed (switch body vs harness/connector — `5P30-M55-W8W` may be
-      a harness code rather than the switch model)
+- [ ] Where each marking is printed — switch body, carrier PCB, or harness
 
 Needs the module assembled, or at least the switch offered up to its seat:
 
@@ -262,8 +284,8 @@ there is **confirmed correct on this physical unit**:
 StackExchange thread, and it turns out to be right — including the pin order, which nothing in
 that thread could have established.
 
-Still open from that document: the connector model. Scowt's "JST, might be XH but not certain"
-is unresolved here too — the pitch has not been measured (§9).
+The one item that does not hold is the connector guess: Scowt's "JST, might be XH but not
+certain" would be a 2.5 mm pitch, and the measured pitch is **1.5 mm** — ZH family (§2).
 
 This also settles a fork in [io-pcb](../../../io-pcb/README.md), which references the
 AlieksieievYurii 6-pin `JST PH2.0` pinout with a `HALL_DIR` line and asks for it to be
@@ -362,7 +384,7 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 | Torque | ❌ not measured |
 | Max / rated wheel speed | ❌ not measured |
 | Cable lengths | ✅ 220 mm total, 155 mm past the cable guide |
-| Connector models (both ends) | ⚠️ 7-way, single connector; JST family/pitch not yet measured |
+| Connector models (both ends) | ⚠️ module side: 7-way, 1.5 mm pitch (ZH family) ✅; board side is the I/O board's choice |
 | Full connector + motor pinouts | ✅ both — motor-side 5-wire and the 7-pin module connector, pin for pin |
 | Wheel-drop sensor model + pinout | ⚠️ mechanical switch confirmed, 2 brown wires, no polarity; NO/NC and mechanical polarity open — §5 |
 | Signal waveforms | ❌ no scope captures (multimeter only) |
@@ -374,9 +396,8 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 - [ ] Hall IC part number — requires lifting the PCB, the marked face is hidden
 - [ ] Winding resistance, no-load current @ 12 V, stall current
 - [ ] Wheel-drop switch: NO/NC at rest, and which mechanical state means wheel retracted (§5)
-- [ ] Connector model: measure the **pitch** (2.5 mm = JST XH, 2.0 = PH, 1.5 = ZH,
-      1.25 = GH) and state the **orientation reference** for pin 1 (which face the retention
-      latch is on), so the pin order in §2 is unambiguous to wire against
+- [ ] Confirm the connector is genuine JST ZH rather than a pitch-compatible clone (no
+      manufacturer marking found; matters for sourcing the mating part, not for the pinout)
 - [ ] **Confirm the pole count with a scope or frequency counter** — the hand count in §4 is
       a lower bound, and §7 cannot separate 4 pole pairs from 8
 - [ ] Scope captures of the encoder output under load (noise, edge quality)
