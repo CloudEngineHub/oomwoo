@@ -48,6 +48,67 @@ Generic RS-360 family figures circulated by distributors — ≈12 000 rpm no-lo
 only**. They were not measured on this unit and should not be quoted as the part's
 specification, nor used as CAD dimensions.
 
+### Winding resistance and stall current — VERIFIED
+
+Measured with the **rotor locked**, on the motor leads, driving a known current from a
+current-limited bench supply and reading the terminal voltage. Three operating points:
+
+| Current | Terminal voltage |
+|---|---|
+| 0.27 A | 3.30 V |
+| 0.50 A | 4.43 V |
+| 1.00 A | 7.00 V |
+
+A brushed motor is not a pure resistor: the brush-to-commutator contact drops a roughly
+**constant** voltage that does not scale with current. Fitting `V = V₀ + I·R` by least squares:
+
+| Parameter | Value |
+|---|---|
+| **Winding resistance R** | **5.08 Ω** |
+| **Brush contact drop V₀** | **1.91 V** |
+| Fit residuals | < 25 mV at all three points |
+
+The fit is linear across the whole measured range, so the split between winding and brush drop
+is a real feature of the motor, not an artefact of two points.
+
+> ⚠️ **Do not compute stall current as V/R from a low-current measurement.** The naive
+> quotient at 0.5 A gives an apparent 8.86 Ω, because it charges the fixed ~1.9 V brush drop as
+> if it were resistance. That **underestimates stall current by about 60%** — exactly the kind
+> of error that leaves an H-bridge undersized.
+
+Stall current, `I = (V − V₀) / R`:
+
+| Supply | Stall current |
+|---|---|
+| 12 V | 1.99 A |
+| 14.4 V (4S nominal) | 2.46 A |
+| **16.8 V (4S fully charged — worst case)** | **2.93 A** |
+
+**Upper bound, model-independent:** even if the brush drop vanished entirely at high current,
+Ohm's law alone caps the draw at 16.8 / 5.08 = **3.31 A**. This motor cannot ask for more than
+that on a fully charged 4S pack, whatever the brushes do.
+
+That matters for the driver choice: the DRV8870 / TMI8870 on the reference I/O board is rated
+3.6 A peak, so it clears the worst case — by 23% on the fitted figure, 9% on the hard upper
+bound. The `SPEC.md` placeholder of "3.5 A (TODO — needs verification)" turns out to have been
+a good guess.
+
+**Caveats.** Measured cold; copper gains roughly 25% resistance at 80 °C, so a hot motor draws
+*less* — the figures above are the conservative end. Stall is extrapolated 3× beyond the
+highest measured point. And these were taken at **one rotor position**: with few commutator
+segments the resistance varies with shaft angle, and the minimum-resistance position is the one
+that sets the true peak. That sweep is still open (§9), and it is the only thing that could
+push this motor past the driver's rating.
+
+> **An ohmmeter will not reproduce these numbers — don't try to check them that way.** At the
+> sub-milliamp test current of a multimeter's resistance range, the reading is dominated by the
+> brush-to-commutator contact and its oxide film, not by the copper. On this motor an ohmmeter
+> gave anything from 14 Ω to over 100 Ω depending on shaft angle and on the moment, and was not
+> repeatable: a later sweep bottomed out at 20 Ω where an earlier static reading had given 14 Ω.
+> None of that reflects the winding. Drive a known current and read the terminal voltage, as
+> above. The ohmmeter is good only for confirming the order of magnitude — which it does: tens
+> of ohms apparent, not single digits, is what rules out the shaft having been spinning.
+
 ## 2. Wiring — VERIFIED
 
 Five wires leave the rear PCB. Two are the motor winding, three are the Hall sensor.
@@ -199,18 +260,38 @@ per wheel.
 |---|---|---|
 | Markings | `MG01-13` / `5P30-M55-W8W` | recorded |
 | Manufacturer | Unknown — neither marking resolves to a public datasheet (OEM part) | — |
-| Type | **Mechanical switch** (not an optical or Hall sensor), snap-action body with a lever | confirmed on the part |
+| Type | **SPDT snap-action microswitch** — three terminals, COM / NO / NC, with a lever | VERIFIED |
 | Mounting | Soldered to a **small carrier PCB**, not wired directly; the two harness wires land on that PCB | confirmed |
 | Carrier PCB silkscreen | **`COM`** and **`KEY1`** | read off the photo |
 | Wiring | Two wires, both the same colour — **brown on the left module, grey on the right** | confirmed on both |
 | Polarity | None — a dry contact, so the two wires are electrically interchangeable | — |
-| NO / NC at rest | Not yet determined | open |
+| **Contacts used** | **COM and NC** — the normally-closed branch. NO is left unused | VERIFIED |
 
-The switch sits on a carrier PCB whose silkscreen labels the two nets `COM` and `KEY1`, so one
-wire is the common and the other the switched contact. Which harness wire lands on which pad
-is not established here — with two identical-coloured wires, that needs a continuity check
-rather than a photo. Note also that `MG01-13` may be the **carrier PCB's** designation rather
-than the switch model, which would explain why neither marking resolves publicly.
+### Contact behaviour — VERIFIED
+
+| Lever | COM–NC | COM–NO | Harness (the two wires) |
+|---|---|---|---|
+| At rest (not pressed) | **closed** | open | **closed — continuity** |
+| Pressed | open | closed | **open** |
+
+Standard SPDT behaviour, and the module wires the **normally-closed** branch: **at rest the
+two harness wires show continuity, and pressing the lever opens the circuit.** The NO terminal
+is present but unused, so a design that needs the inverse sense can re-land one wire rather
+than invert it in firmware.
+
+This is consistent with `KEY1` being the pad that carries the NC contact, though the pad-to-
+terminal mapping was not traced.
+
+> **What the NC choice implies.** Wiring the normally-closed branch is the classic fail-safe
+> arrangement: a broken wire, a popped connector or a corroded contact all read as *open*, the
+> same as the alarm condition. For that to actually be safe, *open* must be the **wheel-dropped**
+> state — which means the lever should be **pressed when the wheel drops**, not when it
+> retracts. That is an inference from the design choice, not a measurement: the mechanical
+> correspondence is still open below. **Firmware should treat open as wheel-dropped and stop**,
+> which is the safe reading whichever way the mechanism turns out to work.
+
+Note also that `MG01-13` may be the **carrier PCB's** designation rather than the switch model,
+which would explain why neither marking resolves publicly.
 
 **The switch wire colour encodes the side.** Both modules of the pair were checked: the left
 one has the pair in brown, the right one in grey. That is worth knowing — it is the only
@@ -231,9 +312,6 @@ Both descriptions are correct, for different sides.
 
 Measurable now, even with the switch out of the module (multimeter, no power):
 
-- [ ] **NO or NC at rest** — press the actuator and watch continuity. One minute of work, and
-      it is half of what the firmware needs
-- [ ] Which of the two wires lands on `COM` and which on `KEY1` (continuity to the pads)
 - [ ] Contact rating, if printed on the body
 - [ ] Where each marking is printed — switch body, carrier PCB, or harness
 
@@ -380,13 +458,13 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 | Wheel diameter | ✅ 71.5 mm OD |
 | Rated voltage | ✅ 12 V (can marking) |
 | Max voltage | ❌ not established |
-| Current (no-load & stall) | ❌ not measured |
+| Current (no-load & stall) | ⚠️ stall ✅ 2.93 A at 16.8 V (§1, winding 5.08 Ω + 1.91 V brush drop); no-load current not measured |
 | Torque | ❌ not measured |
 | Max / rated wheel speed | ❌ not measured |
 | Cable lengths | ✅ 220 mm total, 155 mm past the cable guide |
 | Connector models (both ends) | ⚠️ module side: 7-way, 1.5 mm pitch (ZH family) ✅; board side is the I/O board's choice |
 | Full connector + motor pinouts | ✅ both — motor-side 5-wire and the 7-pin module connector, pin for pin |
-| Wheel-drop sensor model + pinout | ⚠️ mechanical switch confirmed, 2 brown wires, no polarity; NO/NC and mechanical polarity open — §5 |
+| Wheel-drop sensor model + pinout | ⚠️ SPDT microswitch, wired COM+NC (closed at rest), 2 wires, no polarity ✅; model unidentified and mechanical correspondence open — §5 |
 | Signal waveforms | ❌ no scope captures (multimeter only) |
 | Assembly weight | ❌ not measured |
 
@@ -394,8 +472,13 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 
 - [ ] Motor can dimensions (diameter, body length, shaft diameter) — also needed for CAD
 - [ ] Hall IC part number — requires lifting the PCB, the marked face is hidden
-- [ ] Winding resistance, no-load current @ 12 V, stall current
-- [ ] Wheel-drop switch: NO/NC at rest, and which mechanical state means wheel retracted (§5)
+- [ ] **Resistance vs. rotor position** — sweep the shaft with an ohmmeter to find the
+      minimum-resistance angle, then repeat the three-point measurement there. That sets the
+      real peak draw, and it is the one result that could push this motor past the driver's
+      3.6 A rating (§1)
+- [ ] No-load current at 12 V (needs the shaft free)
+- [ ] Wheel-drop switch: which mechanical state presses the lever — needs the module
+      assembled. Everything electrical about it is now measured (§5)
 - [ ] Confirm the connector is genuine JST ZH rather than a pitch-compatible clone (no
       manufacturer marking found; matters for sourcing the mating part, not for the pinout)
 - [ ] **Confirm the pole count with a scope or frequency counter** — the hand count in §4 is
