@@ -18,8 +18,8 @@ or open.
 | Vendor | AliExpress — [listing 1005007359089056](https://es.aliexpress.com/item/1005007359089056.html) |
 | Unit tested | One module, disassembled |
 | Motor can markings | `CDM-MOTOR` / `GM-RS360-16248` / `DC 12.0V` / `20231209C1` |
-| Measured by | [@IKsares](https://github.com/IKsares), July 2026 |
-| Instruments | Digital multimeter, bench supply, calipers |
+| Measured by | [@IKsares](https://github.com/IKsares), July–August 2026 |
+| Instruments | Digital multimeter, bench supply, calipers, scale |
 
 > ⚠️ **This is an aftermarket module, not an OEM Roborock teardown.** The motor fitted here
 > is a CDM `GM-RS360-16248`. An OEM module, or another aftermarket batch, may ship a
@@ -47,6 +47,34 @@ Generic RS-360 family figures circulated by distributors — ≈12 000 rpm no-lo
 3–10 W, ≈52 g, 6–24 V operating range, can ≈Ø27 mm × ≈50 mm long — are **order-of-magnitude
 only**. They were not measured on this unit and should not be quoted as the part's
 specification, nor used as CAD dimensions.
+
+### Physical dimensions and mass — VERIFIED
+
+Calipers on the motor with its rear Hall PCB fitted and the pinion pressed on, as pictured.
+
+| Dimension | Value | Taken |
+|---|---|---|
+| Can diameter | **27.5 mm** | across the cylinder, clear of the seam |
+| Length, rear PCB to front face | **34.0 mm** | shaft excluded |
+| Shaft protrusion | **10.3 mm** | front face to tip |
+| **Overall axial envelope** | **44.3 mm** | 34.0 + 10.3 |
+| Shaft diameter | **2.20 mm** | |
+| Mass | **66 g** | motor, rear PCB and 220 mm pigtail — *not* the complete wheel module |
+
+![The motor out of the gearbox: can markings, the helical brass pinion on the front shaft, the two front-face mounting screws, and the rear Hall PCB with the magnetic ring carrier standing proud of it](motor-can-and-pinion.jpg)
+
+**The diameter confirms the frame family; the circulated length does not describe this unit.**
+27.5 mm sits on the RS-360 nominal 27.7 mm, so reading the frame class off the can marking
+holds up. But the ≈50 mm length quoted for the family is 16 mm longer than this entire motor
+measured *including* its rear PCB — this is a short-can variant. The ≈52 g family figure misses
+in the other direction, against 66 g here (which does include the PCB and the pigtail). Of the
+three family dimensions that can now be checked against this unit, **one holds and two do not**
+— a concrete example of why the figures above must not be lifted into CAD.
+
+> **The rear face is not flat.** The magnetic ring carrier and the solder tabs stand proud of
+> the PCB by a few millimetres (visible in the photo). The 34.0 mm is measured to the PCB, so
+> the true rear envelope is somewhat longer. A housing design needs that clearance measured
+> before it can be trusted (§9).
 
 ### Winding resistance and stall current — VERIFIED
 
@@ -234,8 +262,11 @@ pull-up — a resistor is visible on the silkscreen).
 
 ## 3. Gearbox — VERIFIED
 
-Compound spur gear train, four reduction stages from the motor pinion to the wheel output.
-Teeth counted on the opened gearbox.
+Compound gear train, four reduction stages from the motor pinion to the wheel output. Teeth
+counted on the opened gearbox. The motor pinion is **helical** (see below); the tooth form of
+the three later stages was not recorded, so the train may be helical throughout or helical
+only at the motor. Either way the tooth counts, and therefore every ratio in this section,
+are unaffected.
 
 | Stage | Driver (teeth) | Driven (teeth) | Ratio |
 |---|---|---|---|
@@ -246,6 +277,52 @@ Teeth counted on the opened gearbox.
 
 **Total reduction i = (36·42·34·24) / (11·13·12·11) = 1 233 792 / 18 876 ≈ 65.36 : 1**
 (motor revolutions per wheel revolution).
+
+### Motor pinion — tooth form and module
+
+Brass pinion pressed onto the front shaft, 11 teeth, **visibly helical** in the photo in §1.
+
+**Outside diameter: 7.00 mm as read, ≈7.14 mm corrected.** With an odd tooth count a caliper
+cannot bridge tip to tip — it rests on one tip and on the two tips flanking the opposite gap,
+reading `De·(1 + cos(180°/z))/2`, which for z = 11 is 0.980·De. The correction is +2%.
+
+Comparing hypotheses as *what the caliper would have read*, so the same 0.980 factor applies
+to all of them:
+
+| Hypothesis | Theoretical De | Expected caliper reading |
+|---|---|---|
+| Spur, m = 0.5 | 6.50 mm | 6.37 mm |
+| Spur, m = 0.6 | 7.80 mm | 7.64 mm |
+| Helical, mn = 0.5, β = 20° | 6.85 mm | 6.71 mm |
+| **Helical, mn = 0.5, β = 25°** | 7.07 mm | **6.93 mm** |
+| Helical, mn = 0.5, β = 30° | 7.35 mm | 7.20 mm |
+
+The measured 7.00 mm falls between β = 25° and β = 30°. **No standard spur module fits**:
+m = 0.5 is 0.6 mm short and m = 0.6 overshoots by as much, and closing that gap with a spur
+gear would require a profile shift of about +0.6 — implausible on a pinion already helical
+by inspection. So the first stage is most likely **normal module 0.5 with a helix angle of
+25–30°**, which lands on the measurement with no profile correction at all.
+
+That is an inference, not a measurement: β was not measured and the mating gear was not
+examined.
+
+> **One caliper reading closes it — the first-stage centre distance** (motor shaft to the
+> 36-tooth gear's shaft), since `a = mn·(z₁ + z₂) / (2·cos β)`:
+>
+> | | Centre distance |
+> |---|---|
+> | Spur, m = 0.5 | 11.75 mm |
+> | Helical, mn = 0.5, β = 20° | 12.50 mm |
+> | Helical, mn = 0.5, β = 25° | 12.97 mm |
+> | Helical, mn = 0.5, β = 30° | 13.57 mm |
+>
+> The candidates are more than half a millimetre apart, so the reading discriminates cleanly.
+> **With the module and helix angle fixed, all four stages in §3 become geometrically
+> defined** — pitch diameters, centre distances and tooth geometry all follow from the counts
+> already recorded, and the gearbox never has to be opened again to model it in CAD.
+
+A helical first stage also means the pinion generates **axial thrust** under load, which the
+motor's front bearing and any housing design have to take. A spur assumption would miss it.
 
 ## 4. Encoder resolution and odometry — MEASURED, with a caveat
 
@@ -495,12 +572,22 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 | Full connector + motor pinouts | ✅ both — motor-side 5-wire and the 7-pin module connector, pin for pin |
 | Wheel-drop sensor model + pinout | ⚠️ SPDT microswitch, wired COM+NC (closed at rest), 2 wires, no polarity ✅; model unidentified and mechanical correspondence open — §5 |
 | Signal waveforms | ❌ no scope captures (multimeter only) |
-| Assembly weight | ❌ not measured |
+| Assembly weight | ⚠️ motor 66 g (with rear PCB and pigtail) ✅; complete wheel module not weighed |
+| Motor dimensions (for CAD) | ⚠️ Ø27.5 mm can, 44.3 mm axial envelope, Ø2.20 mm shaft ✅; mounting pattern and rear clearance open — §1, §9 |
 
 ## 9. Open points
 
-- [ ] Motor can dimensions (diameter, body length, shaft diameter) — also needed for CAD
 - [ ] Hall IC part number — requires lifting the PCB, the marked face is hidden
+- [ ] **First-stage centre distance** — the one caliper reading that fixes the module and helix
+      angle, and with them the full geometry of all four gear stages (§3)
+- [ ] Helix angle and face width of the pinion, and whether the three later stages are helical
+      or spur
+- [ ] Motor mounting interface: the two front-face screws (hole spacing, thread, depth) and the
+      front centring boss — needed to model the motor-to-gearbox joint
+- [ ] Rear clearance behind the Hall PCB: the magnetic ring carrier and solder tabs stand proud
+      of it, so the 44.3 mm envelope in §1 is measured to the PCB, not to the rearmost point
+- [ ] Complete wheel module: mass, envelope, wheel width, suspension travel, and the wheel axis
+      relative to the chassis mounting plane
 - [ ] **Resistance vs. rotor position** — sweep the shaft with an ohmmeter to find the
       minimum-resistance angle, then repeat the three-point measurement there. That sets the
       real peak draw, and it is the one result that could push this motor past the driver's
