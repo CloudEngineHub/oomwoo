@@ -170,10 +170,8 @@ license (TBD).
 
 <!-- Self-hosted star history (auto-refreshed by .github/workflows/star-history.yml).
      No third-party embed / sealed token to expire. -->
-<a href="https://star-history.com/#makerspet/oomwoo&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/star-history-dark.svg" />
-   <source media="(prefers-color-scheme: light)" srcset=".github/assets/star-history-light.svg" />
-   <img alt="OOMWOO star history" src=".github/assets/star-history-light.svg" width="820" />
- </picture>
-</a>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/star-history-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset=".github/assets/star-history-light.svg" />
+  <img alt="OOMWOO star history" src=".github/assets/star-history-light.svg" width="820" />
+</picture>
