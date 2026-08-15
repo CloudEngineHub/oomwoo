@@ -55,7 +55,7 @@ Open Source Deliverables:
 - [x] 3D-scanned [sourced parts](https://github.com/makerspet/oomwoo-one-cad/tree/main/lib)
 - [ ] 3D-printable [files](https://github.com/makerspet/oomwoo-one-cad)
 - [ ] Raspberry Pi [software](https://github.com/makerspet/oomwoo-install)
-- [ ] Motor drivers, sensors [I/O PCB](https://github.com/makerspet/oomwoo-io-board)
+- [ ] Motor drivers, sensors [PCB boards](https://github.com/makerspet/oomwoo-pcb)
 - [ ] I/O PCB [firmware](https://github.com/makerspet/oomwoo-io-firmware)
 - [ ] Build, setup, bringup and troubleshooting [instructions](docs/BUILD_INSTRUCTIONS.md)
 - [ ] Demo video(s)
