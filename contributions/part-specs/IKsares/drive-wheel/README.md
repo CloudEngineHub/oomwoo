@@ -545,7 +545,7 @@ count *"speculative without physical inspection"*. This document supplies both m
 | Quantity | OsakaTX (derived) | Measured here | How |
 |---|---|---|---|
 | Gearbox ratio | ~190 : 1 | **65.36 : 1** | teeth counted, 4 spur stages |
-| Magnetic ring | ~32 poles (speculative) | **8 poles (4 pole pairs)** | edges counted by hand per motor revolution, multimeter — see §4 |
+| Magnetic ring | ~32 poles (speculative) | **8 poles (4 pole pairs)** | cycles counted on a scope against an index mark, one motor revolution — see §4 |
 | Wheel diameter | 65 mm, from alvarosamudio's simulation URDF | **71.5 mm** | calipers, on the physical wheel |
 | Motor | Nidec 20N704RC70, 14.4 V (catalogue, flagged "in development") | **CDM GM-RS360-16248, 12 V** | read off the can |
 
