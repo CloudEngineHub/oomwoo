@@ -373,6 +373,8 @@ reference, not an inference.
 | **Wheel speed, no load** | **≈94 rpm → ≈0.35 m/s** |
 | Mark-space ratio | ≈54 % *(provisional — read off the trace; to be confirmed with the scope's automatic +Duty measurement)* |
 
+![Encoder output at no load with the 10 kΩ pull-up fitted: 1 V/div, 2 ms/div, trigger at 1.68 V, hardware frequency counter reading 410.000 Hz](encoder-output-no-load.webp)
+
 No spurious pulses appeared over 144 ms of capture at full no-load speed, so this motor's
 commutation noise does not reach the switching threshold with a 10 kΩ pull-up fitted. Behaviour
 under load has not been captured.
@@ -633,7 +635,7 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 | Connector models (both ends) | ⚠️ module side: 7-way, 1.5 mm pitch (ZH family) ✅; board side is the I/O board's choice |
 | Full connector + motor pinouts | ✅ both — motor-side 5-wire and the 7-pin module connector, pin for pin |
 | Wheel-drop sensor model + pinout | ⚠️ SPDT microswitch, wired COM+NC (closed at rest), 2 wires, no polarity ✅; model unidentified and mechanical correspondence open — §5 |
-| Signal waveforms | ⚠️ scope-measured — amplitude, noise, frequency and mark-space ratio in §4; capture images not yet attached |
+| Signal waveforms | ✅ no-load capture attached (§4), with amplitude, noise, frequency and mark-space ratio; under load not captured |
 | Assembly weight | ⚠️ motor 66 g (with rear PCB and pigtail) ✅; complete wheel module not weighed |
 | Motor dimensions (for CAD) | ⚠️ Ø27.5 mm can, 44.3 mm axial envelope, Ø2.20 mm shaft ✅; mounting pattern and rear clearance open — §1, §9 |
 
@@ -664,8 +666,6 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 - [ ] Scope captures of the encoder output **under load** — noise and edge quality at no load
       are clean (§4), but the brush noise the 100 nF / RC measures in §6 guard against only
       appears with current through the winding
-- [ ] Attach the scope capture images to this folder — the measurements in §4 are recorded but
-      the screenshots are not yet in the repo
 - [ ] **Exact mark-space ratio.** §4 puts it at ≈54 % read off the trace, enough to establish
       that the ring is asymmetric and that velocity must be timed over whole cycles. The precise
       figure needs the scope's automatic +Duty measurement
