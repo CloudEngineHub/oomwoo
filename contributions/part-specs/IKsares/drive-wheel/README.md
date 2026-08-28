@@ -19,7 +19,7 @@ or open.
 | Unit tested | One module, disassembled |
 | Motor can markings | `CDM-MOTOR` / `GM-RS360-16248` / `DC 12.0V` / `20231209C1` |
 | Measured by | [@IKsares](https://github.com/IKsares), July–August 2026 |
-| Instruments | Digital multimeter, bench supply, calipers, scale |
+| Instruments | Digital multimeter, bench supply, calipers, scale, Hantek DSO5202P oscilloscope |
 
 > ⚠️ **This is an aftermarket module, not an OEM Roborock teardown.** The motor fitted here
 > is a CDM `GM-RS360-16248`. An OEM module, or another aftermarket batch, may ship a
@@ -176,7 +176,7 @@ Five wires leave the rear PCB. Two are the motor winding, three are the Hall sen
 | black | motor terminal 2 | interchangeable with red |
 | orange | Hall sensor **VCC** | verified working at 3.3 V, ≈2.5 mA |
 | brown | Hall sensor **GND** | sensor reference |
-| blue | Hall sensor **OUT** | swings 0 V ↔ VCC, no external pull-up needed |
+| blue | Hall sensor **OUT** | **open collector — external pull-up required**; swings 0 V ↔ VCC with one |
 
 > ⚠️ **Colour-code warning.** The sensor wiring does **not** follow the common industrial
 > convention (brown = +, blue = 0 V). On this unit **brown is GND and orange is VCC**.
@@ -254,11 +254,16 @@ conductors between them. Their colour depends on which side the module is from �
    consistent with a digital Hall IC. Spinning the shaft by hand, blue **toggles between
    0 V and 2.7 V** — essentially rail to rail.
 
-Two conclusions follow from the functional test: the sensor is operational at **3.3 V**,
-which rules out the classic 4.5–24 V Hall parts (A3144 class) and points to a modern
-low-voltage IC; and the output reaches nearly VCC with no external resistor, so **no
-external pull-up is required** (the stage is push-pull, or the board carries its own
-pull-up — a resistor is visible on the silkscreen).
+One conclusion follows safely from the functional test: the sensor is operational at
+**3.3 V**, which rules out the classic 4.5–24 V Hall parts (A3144 class) and points to a
+modern low-voltage IC.
+
+> ⚠️ **A second conclusion drawn here was wrong, and is corrected in §4.** The multimeter
+> showed blue reaching nearly VCC with no external resistor, which was read as "no external
+> pull-up is required". It is not: a multimeter's 10 MΩ input cannot tell a driven high level
+> from a floating node. On a scope, **removing the pull-up leaves the blue line carrying
+> nothing but noise**. The output stage is open collector and an external pull-up is
+> mandatory — see §4 and requirement 2 in §6.
 
 ## 3. Gearbox — VERIFIED
 
@@ -324,18 +329,16 @@ examined.
 A helical first stage also means the pinion generates **axial thrust** under load, which the
 motor's front bearing and any housing design have to take. A spur assumption would miss it.
 
-## 4. Encoder resolution and odometry — MEASURED, with a caveat
+## 4. Encoder resolution and odometry — VERIFIED
 
 Base measurement: **4 rising edges per motor revolution**, i.e. 4 pulse cycles per
 revolution → the magnetic ring has **4 pole pairs (8 poles)**.
 
-**Method, and its limits.** The motor was out of the gearbox and its shaft turned slowly by
-hand while watching the blue line toggle on a multimeter — so this counts edges per *motor*
-revolution, not per wheel revolution. **No oscilloscope and no frequency counter were used.**
-A multimeter's refresh rate is slow, so this is only reliable if the shaft is turned slowly
-enough that no transition is missed. If any were missed, **4 is a lower bound** and the real
-count would be a multiple of it — 8 pole pairs would halve every distance below. The figure
-is consistent with the independent cross-check in §7, but a scope capture would settle it.
+**Method.** First counted by hand, turning the shaft slowly out of the gearbox while watching
+the blue line toggle on a multimeter. That count was a lower bound — a multimeter cannot be
+trusted not to miss a transition — so it was re-run on an oscilloscope against an index mark
+on the shaft, and confirmed end to end against wheel revolutions. Both are described under
+*Verified with a scope* below. The lower-bound caveat is retired.
 
 Fixed data used below: gearbox reduction 65.36 : 1; wheel outer diameter **71.5 mm**
 (measured with calipers); wheel circumference π × 71.5 = **224.6 mm**.
@@ -349,7 +352,50 @@ Fixed data used below: gearbox reduction 65.36 : 1; wheel outer diameter **71.5 
 | Angular resolution at the wheel | ≈ 1.38° | ≈ 0.69° |
 
 Firmware can count rising edges only (0.859 mm/edge) or both edges to double the resolution
-(0.430 mm/edge) with no hardware change.
+(0.430 mm/edge) with no hardware change — but see the mark-space note below before relying on
+both-edge timing for velocity.
+
+### Verified with a scope
+
+Rig: motor at 12.0 V; sensor at 3.3 V; **10 kΩ pull-up from blue to orange**; both supply
+negatives bonded; ×10 probe with its ground clip on sensor GND; 20 MHz bandwidth limit on.
+
+**Pole count.** With an index mark on the shaft, one full revolution produces exactly **4
+complete cycles** — 4 rising and 4 falling edges. This is a direct count against a physical
+reference, not an inference.
+
+| Quantity | Value |
+|---|---|
+| Output swing, level to level | ≈3.35 V — essentially rail to rail at a 3.3 V supply |
+| Superimposed noise | ≈0.2–0.3 V, far below the switching threshold |
+| Encoder frequency, no load | **410–412 Hz** (hardware frequency counter, two captures) |
+| **Motor speed, no load @ 12 V** | **6 150–6 180 rpm** |
+| **Wheel speed, no load** | **≈94 rpm → ≈0.35 m/s** |
+| Mark-space ratio | ≈54 % *(provisional — read off the trace; to be confirmed with the scope's automatic +Duty measurement)* |
+
+No spurious pulses appeared over 144 ms of capture at full no-load speed, so this motor's
+commutation noise does not reach the switching threshold with a 10 kΩ pull-up fitted. Behaviour
+under load has not been captured.
+
+**External pull-up is mandatory.** Removing the 10 kΩ resistor with the rest of the rig
+untouched leaves the blue line carrying only noise. The output stage is open collector with no
+usable on-board pull-up, correcting the conclusion originally drawn in §2 from a multimeter
+reading.
+
+**End-to-end confirmation.** At 65.36 : 1 with a 71.5 mm wheel, 410 Hz predicts 20 wheel
+revolutions in 12.7 s. Timed with a stopwatch: **12.2 s and 12.8 s**. Read the other way, 20
+wheel revolutions is 4492 mm, and at 410 Hz the encoder issues 5125 rising edges in 12.5 s →
+**0.876 mm/edge against the 0.859 mm** derived in the table above. The 2 % gap is the
+stopwatch's precision, not the model's. One measurement therefore validates the pole count,
+the tooth-counted gear ratio and the distance-per-edge constant together. The alternative
+2-cycles-per-revolution hypothesis predicted 6.4 s and is excluded.
+
+> **The mark-space ratio is not 50 %, and firmware needs to know.** At ≈54 % the high sector
+> spans ≈48.6° of motor rotation and the low sector ≈41.4°, so intervals between *adjacent*
+> edges alternate long-short. Accumulated distance is unaffected — each pair of edges still
+> sums to exactly 0.859 mm — but a velocity estimate timed between adjacent edges oscillates
+> **±8 % with the shaft turning at perfectly constant speed**. Time a whole cycle instead:
+> rising edge to rising edge, or edge N to edge N+2.
 
 > **Design limitation:** single channel. This gives speed and distance, **not direction and
 > not absolute position**. Direction has to be inferred from the polarity the controller
@@ -434,14 +480,24 @@ Needs the module assembled, or at least the switch offered up to its seat:
 1. **Sensor supply: 3.3 V or 5 V**, to match the controller logic. Verified at 3.3 V here;
    5 V not tested on this unit. **Do not feed the sensor from 12 V** until the Hall IC is
    identified and its maximum supply confirmed.
-2. **Common ground.** Tie sensor GND (brown) to the motor driver negative at a single point
+2. **Pull-up on the blue line — mandatory, not optional.** The output stage is open collector
+   (§4). Fit **10 kΩ from blue to sensor VCC**, on the controller board close to the
+   connector. Without it there is no signal at all, only noise. Anything from 2.2 kΩ to
+   22 kΩ works; 4.7 kΩ buys noise immunity on a long harness for 0.7 mA. An MCU's internal
+   pull-up (typically 30–50 kΩ) will function but is weak and high-impedance — poor company
+   for a 220 mm harness running alongside motor power.
+3. **Common ground.** Tie sensor GND (brown) to the motor driver negative at a single point
    near the controller, so motor return current does not flow through the sensor reference.
-3. **Decoupling.** 100 nF between orange and brown, as close to the motor as possible.
-4. **Signal filtering.** A brushed motor at speed generates significant commutation noise.
-   If spurious pulses appear under load, add an RC filter (1 kΩ + 10 nF) on the blue line
-   before the MCU input.
-5. **Harness.** Keep the sensor wires physically away from the power wires; twisting the
+4. **Decoupling.** 100 nF between orange and brown, as close to the motor as possible.
+5. **Signal filtering.** A brushed motor at speed generates significant commutation noise. No
+   spurious pulses were seen at no load with the 10 kΩ pull-up fitted (§4). If they appear
+   under load, add an RC filter (1 kΩ + 10 nF) on the blue line before the MCU input.
+6. **Harness.** Keep the sensor wires physically away from the power wires; twisting the
    red/black pair reduces emission.
+7. **Velocity measurement.** The ring sectors are asymmetric (mark-space ≈54 %, §4). Time a
+   whole cycle — rising edge to rising edge, or edge N to edge N+2 — never two adjacent edges,
+   which injects ±8 % ripple into the velocity estimate at constant shaft speed. Accumulated
+   distance is unaffected either way.
 
 ## 7. Cross-checks against existing contributions
 
@@ -522,23 +578,29 @@ two intermediate derivations:
   taken from the simulation URDF. With the measured 71.5 mm the arithmetic lands on the
   8-pole ring counted here, no speculation needed.
 - **~190 : 1** — derived by assuming the configured `max_linear_speed = 0.3 m/s` corresponds
-  to the motor at no-load speed. It need not: with the measured 65.36 : 1 and an RS-360-class
-  no-load figure (order of magnitude ≈12 000 rpm at 12 V), the wheel would top out near
-  0.69 m/s, making 0.3 m/s a deliberate software limit rather than a mechanical ceiling.
+  to the motor at no-load speed. The measured ratio is 65.36 : 1, so the figure itself does not
+  survive, but its premise turns out to be close to right. The **measured** no-load speed is
+  6 150–6 180 rpm (§4), not the ≈12 000 rpm the generic RS-360 figure suggests, which puts
+  the wheel at **≈0.35 m/s** unloaded. The configured 0.3 m/s therefore sits at roughly 85 %
+  of the no-load ceiling — near the mechanical limit rather than a loose software cap. The
+  ≈12 000 rpm family figure is wrong for this variant by about 2× and should not be quoted
+  for it.
 
 Residual ~4% could be the aftermarket module differing from the OEM one, the effective
 rolling diameter under load, or the calibration itself.
 
-> **What this cross-check cannot distinguish.** It only pins down the product — **16 counts
-> per motor revolution**. Two hypotheses produce it and this arithmetic cannot tell them
-> apart: 4 pole pairs with the GD32's 4× decoding (assumed above), or 8 pole pairs with plain
-> both-edge counting. The hand count in §4 favours the first, but it is a lower bound, so the
-> second is not excluded — and it would halve every distance-per-edge figure in §4.
+> **Resolved.** This arithmetic on its own only pins down the product — **16 counts per motor
+> revolution** — which two hypotheses satisfy equally: 4 pole pairs with the GD32's 4×
+> decoding (assumed above), or 8 pole pairs with plain both-edge counting. The scope
+> measurement in §4 settles it directly at **4 pole pairs**, counted against an index mark
+> over one shaft revolution. The 4× decoding assumed above is therefore the right reading, and
+> every distance-per-edge figure in §4 stands as measured rather than as a bound.
 
-**Suggested checks:** put a scope on the blue line and turn the shaft one revolution — that
-resolves the pole count directly. Separately, roll a wheel a measured distance (e.g. 2 m) on
-the bench and count edges, which settles ticks/m end to end, independently of every
-derivation above.
+**Still worth doing:** roll a wheel a measured distance (e.g. 2 m) on the floor and count
+edges. The stopwatch check in §4 closes edges per *wheel revolution* end to end, but it works
+from the 71.5 mm free diameter — it cannot see the difference between that and the effective
+rolling diameter under the robot's weight, which is one of the candidates for the residual ~4%
+above.
 
 ### Note for the I/O board design
 
@@ -559,19 +621,19 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
 |---|---|
 | Motor model | ✅ `CDM GM-RS360-16248` |
 | Motor/assembly datasheet | ❌ none published for this variant |
-| Encoder type + PPR | ⚠️ single-channel Hall ✅; 4 rising edges/motor rev counted by hand — lower bound, see §4 |
+| Encoder type + PPR | ✅ single-channel Hall; **4 rising edges/motor rev**, confirmed on a scope against an index mark — §4 |
 | Gearbox ratio | ✅ 65.36 : 1, teeth counted |
 | Wheel diameter | ✅ 71.5 mm OD |
 | Rated voltage | ✅ 12 V (can marking) |
 | Max voltage | ❌ not established |
 | Current (no-load & stall) | ✅ no-load 0.13 A at 12 V; stall 2.93 A at 16.8 V (winding 5.08 Ω + 1.91 V brush drop) — §1 |
 | Torque | ❌ not measured |
-| Max / rated wheel speed | ❌ not measured |
+| Max / rated wheel speed | ✅ no-load ≈94 rpm ≈ **0.35 m/s** at 12 V, from the 410–412 Hz encoder output (§4); under load not measured |
 | Cable lengths | ✅ 220 mm total, 155 mm past the cable guide |
 | Connector models (both ends) | ⚠️ module side: 7-way, 1.5 mm pitch (ZH family) ✅; board side is the I/O board's choice |
 | Full connector + motor pinouts | ✅ both — motor-side 5-wire and the 7-pin module connector, pin for pin |
 | Wheel-drop sensor model + pinout | ⚠️ SPDT microswitch, wired COM+NC (closed at rest), 2 wires, no polarity ✅; model unidentified and mechanical correspondence open — §5 |
-| Signal waveforms | ❌ no scope captures (multimeter only) |
+| Signal waveforms | ⚠️ scope-measured — amplitude, noise, frequency and mark-space ratio in §4; capture images not yet attached |
 | Assembly weight | ⚠️ motor 66 g (with rear PCB and pigtail) ✅; complete wheel module not weighed |
 | Motor dimensions (for CAD) | ⚠️ Ø27.5 mm can, 44.3 mm axial envelope, Ø2.20 mm shaft ✅; mounting pattern and rear clearance open — §1, §9 |
 
@@ -588,27 +650,27 @@ Against the "Drive wheel assembly" list in [part-specs/README.md](../../README.m
       of it, so the 44.3 mm envelope in §1 is measured to the PCB, not to the rearmost point
 - [ ] Complete wheel module: mass, envelope, wheel width, suspension travel, and the wheel axis
       relative to the chassis mounting plane
+- [ ] Torque constant and the torque-speed curve — the no-load speed in §4 supplies the last
+      missing term, so Ke, Kt, stall torque and wheel torque can now be derived; they are not
+      written up in this sheet yet
 - [ ] **Resistance vs. rotor position** — sweep the shaft with an ohmmeter to find the
       minimum-resistance angle, then repeat the three-point measurement there. That sets the
       real peak draw, and it is the one result that could push this motor past the driver's
       3.6 A rating (§1)
-- [ ] **No-load speed** — measurable with a multimeter's frequency range on the encoder output
-      (`rpm = f/4 × 60`). It closes the motor model: Ke = Kt, stall torque, wheel torque and the
-      torque-speed curve all follow from it (§1)
 - [ ] Wheel-drop switch: which mechanical state presses the lever — needs the module
       assembled. Everything electrical about it is now measured (§5)
 - [ ] Confirm the connector is genuine JST ZH rather than a pitch-compatible clone (no
       manufacturer marking found; matters for sourcing the mating part, not for the pinout)
-- [ ] **Confirm the pole count with a scope or frequency counter** — the hand count in §4 is
-      a lower bound, and §7 cannot separate 4 pole pairs from 8
-- [ ] Scope captures of the encoder output under load (noise, edge quality), and whether the
-      100 nF / RC measures in §6 are actually needed on this unit
-- [ ] **Mark-space ratio of the encoder pulse.** §4 offers both-edge counting to double
-      resolution, which silently assumes ~50% duty. If the magnetic ring is asymmetric, the
-      intervals alternate long-short and every other tick lands off — harmless for distance
-      totals, but it injects a fixed jitter into velocity estimates and into any PID that
-      differentiates them. Worth one capture before firmware relies on it
-- [ ] Bench roll test (edges over a measured distance) to close the residual ~4% in §7
+- [ ] Scope captures of the encoder output **under load** — noise and edge quality at no load
+      are clean (§4), but the brush noise the 100 nF / RC measures in §6 guard against only
+      appears with current through the winding
+- [ ] Attach the scope capture images to this folder — the measurements in §4 are recorded but
+      the screenshots are not yet in the repo
+- [ ] **Exact mark-space ratio.** §4 puts it at ≈54 % read off the trace, enough to establish
+      that the ring is asymmetric and that velocity must be timed over whole cycles. The precise
+      figure needs the scope's automatic +Duty measurement
+- [ ] Bench roll test (edges over a measured distance on the floor) to close the residual ~4%
+      in §7 — §4 closes the mechanical half of it, leaving the effective rolling diameter
 - [ ] Confirm whether an OEM Roborock module carries the same 4-pole-pair ring and 65.36 : 1
       train as this aftermarket one
 
