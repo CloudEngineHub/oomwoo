@@ -1,4 +1,10 @@
+<div align="center">
+
 # OOMWOO URDF + Gazebo Simulation
+
+![Status](https://img.shields.io/badge/Status-75%25%20complete-orange)
+
+</div>
 
 ## kitchen_dining World
 
