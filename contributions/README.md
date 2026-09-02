@@ -10,15 +10,18 @@ retire.
 **Status legend** — *Active:* `exploratory` → `ready to start work` /
 `design-first` → `in progress`. *Retired* (closed to new contributions, but
 **kept in place** for provenance): `completed` · `superseded` · `descoped` ·
-`merged`. Each RFC's own `> **Status —**` line is the source of truth; this table
-is the at-a-glance view.
+`merged`.
+
+**This board is canonical** for every RFC's status and progress. An RFC's own
+README describes its scope and how to get started; where its `> Status —` line
+disagrees with the row below, the row below wins. Update this board when you land
+work.
 
 **Progress** is a rough, self-reported percentage of the RFC's scope — a sense of
 "how much is left", not a promise:
 ![>=75%](https://img.shields.io/badge/%3E%3D75%25-brightgreen) nearly there ·
 ![25-74%](https://img.shields.io/badge/25--74%25-yellow) under way ·
 ![<25%](https://img.shields.io/badge/%3C25%25-red) barely started / open.
-This board is the **single source of truth** for RFC progress.
 
 | RFC | What it is | Progress | Status |
 |-----|------------|:--------:|--------|

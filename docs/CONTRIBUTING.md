@@ -72,8 +72,10 @@ independently-built modules compatible.
 
 ## RFC lifecycle
 
-Each `contributions/<rfc>/` folder is an RFC with a `> **Status —**` line; the
-[RFC board](../contributions/README.md) is the at-a-glance index. RFCs move
+Each `contributions/<rfc>/` folder is an RFC describing its scope and how to
+start. The [RFC board](../contributions/README.md) is **canonical** for status
+and progress — update the board when you land work; where an RFC's own
+`> **Status —**` line disagrees with the board, the board wins. RFCs move
 through:
 
 - **Active** — `exploratory` (a bounded experiment) → `ready to start work` /
