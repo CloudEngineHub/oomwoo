@@ -47,3 +47,10 @@ work.
 | [source-3d-models](source-3d-models) | Source 3D models (STEP) for BOM parts | ![85%](https://img.shields.io/badge/85%25-brightgreen) | parts scanning mostly complete: battery, brushes, wheels, mop/FlexiArm, fan, carpet sensor, camera, switches |
 | [stair-climbing](stair-climbing) | Multi-floor: stair climbing (drive-in exoskeleton) | ![0%](https://img.shields.io/badge/0%25-red) | exploratory, for later |
 | [esp32-p4](esp32-p4) | ESP32-P4 experimental compute + safety track | ![0%](https://img.shields.io/badge/0%25-red) | exploratory, for later |
+
+> **Core mechanical design is not an RFC.** The chassis, brushes, mop, wheel
+> mounts and shell are designed in-house and tracked in
+> [oomwoo-one-cad](https://github.com/makerspet/oomwoo-one-cad) — a tightly-coupled
+> reference design is slow and messy to settle by consensus. Planned hardware
+> modules are listed in the [RFC backlog](../docs/RFC_BACKLOG.md); a well-defined,
+> standalone piece (a mount, a spec, a part model) graduates to an RFC here.

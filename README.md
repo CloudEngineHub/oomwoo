@@ -65,7 +65,7 @@ Open Source Deliverables:
 Would you like to contribute? See [CONTRIBUTING](docs/CONTRIBUTING.md) for the full guide.
 
 OOMWOO is organized to built by the community, massively *in parallel*.
-The vacuum and its software are subdivided into [modules](#requests-for-contributions), see list below.
+The vacuum and its software are subdivided into [modules](contributions/README.md), listed on the RFC board.
 
 A volunteer picks whatever module she wants and works on it whenever she wants.
 For *code and simulation* modules she builds her package in her *own repo* and sends
@@ -76,7 +76,7 @@ in-tree under `contributions/module-name/<her-github-username>`. See
 Multiple developers are welcome to work on the same module.
 The best solution for each module surfaces over time, with the project master having the last call.
 
-1. Pick a contribution from the [list below](#requests-for-contributions).
+1. Pick a contribution from the [RFC board](contributions/README.md).
 2. [Let us know](https://github.com/makerspet/oomwoo/discussions) you're working on it and your progress.
 3. Check [ARCHITECTURE.md](docs/ARCHITECTURE.md) and
    [SOFTWARE_INTERFACES.md](docs/SOFTWARE_INTERFACES.md) for the system design

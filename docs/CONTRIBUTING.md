@@ -5,7 +5,7 @@ yourself, and it's at a very early stage. That's the best time to get involved,
 the foundations are still being laid and your input can shape the direction.
 
 The project is built *module by module* so many people can work in parallel.
-Browse the [module list in the README](../README.md#requests-for-contributions),
+Browse the [RFC board](../contributions/README.md),
 and see [ARCHITECTURE.md](ARCHITECTURE.md) for how the pieces fit together.
 
 ## Ways to help right now
@@ -23,7 +23,7 @@ You don't need to be a roboticist to contribute:
 ## Getting started
 
 1. *Pick a module.* Browse the
-   [module list in the README](../README.md#requests-for-contributions) and choose a
+   [RFC board](../contributions/README.md) and choose a
    hardware or software module. Software and simulation modules can start
    immediately; hardware modules wait on the interface specs in
    [ARCHITECTURE.md](ARCHITECTURE.md). Read the module's `README.md` so you know
