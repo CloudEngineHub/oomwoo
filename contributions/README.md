@@ -32,7 +32,7 @@ is the at-a-glance view.
 | [esp32-p4](esp32-p4) | ESP32-P4 experimental compute + safety track | exploratory |
 | [mcu-io-firmware](mcu-io-firmware) | MCU I/O board firmware (STM32G473) | ready to start work |
 | [io-board-interface](io-board-interface) | I/O board software interface | active |
-| [urdf-gazebo-sim](urdf-gazebo-sim) | oomwoo URDF + Gazebo simulation | active |
+| [urdf-gazebo-sim](urdf-gazebo-sim) | oomwoo URDF + Gazebo simulation | 75% complete |
 | [mac-dev-env](mac-dev-env) | macOS (Apple Silicon) dev environment (pixi) | in progress (experimental) |
 | [io-pcb](io-pcb) | I/O + motor-driver PCB (KiCad) | active |
 | [dust-bin](dust-bin) | Dust bin (mechanical module) | active |
