@@ -22,8 +22,6 @@ Instructions: run [living_room.world](https://github.com/makerspet/oomwoo_gazebo
 
 ## Vacuum Robot URDF
 
-Package [makerspet/oomwoo-one](https://github.com/makerspet/oomwoo-one)
-
 Instructions: run OOMWOO vacuum robot [model](https://github.com/makerspet/oomwoo-one) simulation [on your PC](https://makerspet.com/blog/simulate-oomwoo-one-robot-vacuum-in-gazebo-with-ros-2/)
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=7itwscv1bzs" target="_blank">
