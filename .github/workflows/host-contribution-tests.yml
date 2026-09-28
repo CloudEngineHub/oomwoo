@@ -31,6 +31,10 @@ jobs:
           python3 -m unittest discover \
             -s contributions/io-board-interface/xbattlax/tests \
             -p 'test_*.py'
+          python3 contributions/io-board-interface/smailzhu/conformance/generate_gate_vectors.py --check
+          python3 -m unittest discover \
+            -s contributions/io-board-interface/smailzhu/tests \
+            -p 'test_*.py'
 
   protocol-c-cpp:
     runs-on: ubuntu-latest
