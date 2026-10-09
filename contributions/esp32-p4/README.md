@@ -32,6 +32,7 @@ separate from the consumer ROS 2 profile — see
   NIR wide-FoV cameras** (stereo depth + object recognition) — exactly the
   real-time workload an NPU normally accelerates, so whether the P4 can carry it
   is an open question (below).
+  > *Update (Oct 2026):* the vision plan is now **one RGB camera** (parallel interface, read by the STM32) plus 2x VL53L7 ToF, not a stereo pair - see [obstacle-avoidance](../obstacle-avoidance).
 - **Not enough GPIO for the MCU role.** The base controller needs 50+ GPIO (see
   the tentative pin list in issue #18). A TCA9554-class I²C IO expander adds
   *slow* binary in/out only; PWM, encoders, and fast interfaces must stay on a
@@ -103,6 +104,7 @@ art but speaks Espressif ROM protocols, so it needs a separate STM32 backend.
   cores + software AI-acceleration path meet it, or does obstacle avoidance stay
   off the P4 (host-side, or a separate accelerator)? Two OV5647s also need two
   CSI streams (dual-camera interface or a mux) — worth confirming on the P4X.
+  > *Update (Oct 2026):* the vision plan is now **one RGB camera** (parallel interface, read by the STM32) plus 2x VL53L7 ToF, not a stereo pair - see [obstacle-avoidance](../obstacle-avoidance).
 - Does a minimal native ESP-IDF SLAM meet the 200 ms / 32 MB budget at all?
 - Is the LP core enough isolation, or is a dedicated hardware-gate IC still
   required as the final cutoff? (Leaning: keep the external gate regardless.)

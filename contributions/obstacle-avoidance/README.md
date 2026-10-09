@@ -33,6 +33,8 @@ later re-validated on hardware in the [live-robot-bringup RFC](../live-robot-bri
 
 # Front sensor — three candidate approaches (under evaluation)
 
+> **Update (Oct 2026): decided.** The robot ships **2x VL53L7CX/CH multizone ToF** (~126° together) for obstacle *detection*, plus **one RGB camera** (parallel/DVP interface, pitched down) for obstacle *recognition* and for imaging the floor. Stereo depth (A) is dropped: a non-MIPI, low-bandwidth camera is what lets an old smartphone stand in for the Raspberry Pi. Details: [PCB spec, front sensors](https://github.com/makerspet/oomwoo-pcb/blob/main/docs/SPEC.md#front-sensors-module-board).
+
 The 2D LiDAR handles 360° mapping/localization. This module fills the *below-LiDAR,
 forward* gap, which needs a **wide horizontal FoV (target ≥120°)** so obstacles
 across the robot's path — not just dead ahead — are seen. There are three
