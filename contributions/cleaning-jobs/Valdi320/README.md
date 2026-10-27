@@ -1,59 +1,62 @@
-# Valdi320 — cleaning-jobs: durable jobs and ROS2/Nav2 cancel validation
+# Valdi320 — cleaning-jobs: experimental long-running ROS2/Nav2 node
 
-**Source:** [Valdi320/oomwoo-cleaning-jobs](https://github.com/Valdi320/oomwoo-cleaning-jobs)  
-**Verified code:** [c84c181](https://github.com/Valdi320/oomwoo-cleaning-jobs/commit/c84c181da082e2cc44824c45f69462a6cda6b95e)  
-**Evidence:** [ROS2 / real Nav2 / Gazebo validation](https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/ROS2_GAZEBO_VALIDATION.md) · [machine-readable observations](https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/evidence/gazebo_nav2_20261027.json)
+**Source:** [Valdi320/oomwoo-cleaning-jobs](https://github.com/Valdi320/oomwoo-cleaning-jobs)
+**Verified revision:** [f3f3028](https://github.com/Valdi320/oomwoo-cleaning-jobs/commit/f3f3028547c44c748d6bdce8e9c8fb6568cace36)
+**Phase-3 design and reproduction:** [EXPERIMENTAL_ROS_NODE.md](https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/EXPERIMENTAL_ROS_NODE.md)
+**Live Gazebo evidence:** [ros_persistent_gazebo_20261027.json](https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/evidence/ros_persistent_gazebo_20261027.json)
 
-Scope: one independently maintained, Apache-2.0 contribution for the
-[cleaning-jobs RFC](../README.md). This is not a completed RFC or production
-robot safety system.
+Independent module proposal under the [cleaning-jobs RFC](../README.md).
+This is **not a finished cleaning-jobs RFC**, a canonical OOMWOO API, or a
+physical robot safety system.
 
-### Implemented
+### Delivered
 
-- Whole-map / manual rooms / spot selection; conservative grid clearance
-  and no-go cells; persistent progress checkpoint and resume validation.
-- Pause, resume, cancel, service pauses and explicit recovery states.
-- Real ROS2 Jazzy NavigateToPose ActionClient transport, including asynchronous
-  goal acceptance, cancel-before-accept race, real cancellation requests,
-  terminal-result gating and stale callback rejection.
-- Faults and cancel timeouts fail closed, requiring independent backend
-  idle verification before new navigation commands.
-- Three **actual Gazebo robot + real Nav2** tests in the upstream OOMWOO
-  test-room: user pause while moving, battery-low while moving, and cancel
-  before goal acceptance. All returned canceled and no second goal was sent.
-  Simulator odometry checked that movement settled after cancellation.
-- A real ROS2 middleware test against a safe ActionServer, plus pure-Python
-  deterministic fault-injection tests. No artificial cleaning credit for
-  merely reaching a navigation goal.
+- Phase 0: whole-map/manual-room/spot target selection and durable
+  acknowledged-only coverage checkpoints, user/service pauses, restart
+  revalidation and no-go masks.
+- Phase 1: one-active-goal Nav2 cancellation barrier; asynchronous
+  cancel-before-accept, stale-callback rejection, fail-closed timeouts.
+- Phase 2: genuine ROS2 NavigateToPose ActionClient; real OOMWOO Nav2
+  cancellation and robot stopping in Gazebo.
+- **Phase 3: persistent experimental ROS2 node**, with isolated
+  /valdi/cleaning_jobs private JSON command/status topics (start spot,
+  pause, resume, cancel, status), real /map and map-to-base_link TF,
+  live Nav2 costmap footprint admission, battery subscription and
+  BT Navigator GetState lifecycle-ACTIVE gate.
 
-### Reproduce
+### Reproducible evidence
 
-~~~sh
-git clone https://github.com/Valdi320/oomwoo-cleaning-jobs
-cd oomwoo-cleaning-jobs
-PYTHONPATH=src python -m unittest discover -s tests -q
-PYTHONPATH=src python -m oomwoo_cleaning_jobs.demo
-~~~
+- **104 pure-Python tests PASS** plus real ROS2 middleware tests.
+- Live official OOMWOO Gazebo/Nav2 test_room with the long-running node:
+  **3 accepted Nav2 goals**, manual pause/terminal cancel,
+  low-battery automated terminal cancel, simulated resource restoration
+  followed by resume, and final cancel.
+- Battery feed in the Gazebo regression is deliberately **synthetic**:
+  the official test-room world does not publish valid BatteryState.
+  The node itself refuses movement without fresh battery telemetry.
+- Robot odometry: ~0.0675 m before user pause, **0.000 m maximum
+  displacement** during the measured post-stop simulation window.
+  **0 unverified cells** claimed clean, and no extra action dispatched.
+- A lifecycle-negative ROS2 regression confirms that absence of Nav2
+  lifecycle-ACTIVE prevents starting a job.
+- Detailed launch, tests, validation limits and exact container image ID
+  are included in the source repository.
 
-**Evidence:** 92/92 pure-Python regressions passed; also checked inside the
-official ROS2 Jazzy image; ROS2 action server probe passed. The repo's
-ROS2_GAZEBO_VALIDATION.md includes reproducible isolated Podman commands and
-the exact image ID used for the three Gazebo results.
+### Remaining integration / maintainer questions
 
-### Limitations / open architecture decisions
+- The JSON topics are explicitly **experimental and private**, NOT a
+  proposed canonical OOMWOO action/service API.
+- The experimental ROS2 node supports **spot navigation** only;
+  full multi-room sweep, zone editing, docking, recharge, and measured
+  cleaned-area feedback still require integration.
+- No real hardware / MCU safety test. Cancel acknowledgment alone is
+  not a physical emergency-stop guarantee; hard bumper/cliff/current
+  safety remains MCU-owned.
+- Crash-time reconciliation of any unknown outstanding Nav2 goal is
+  still needed before safe persistent reboot/resume; restart fails closed.
+- Please advise the official job API and which clean-and-map producer
+  should provide trusted measured cleaning feedback.
 
-- This is a **real tested ActionClient transport and integration harness**,
-  not yet a persistent ROS2 cleaning-jobs node with the official
-  Start/Pause/Resume/Cancel/status service/action API.
-- No physical motors or MCU safety layer were tested. A successful Nav2 cancel
-  is not proof of a physical emergency stop; independent MCU bumper/cliff/
-  wheel-drop/current protections remain required.
-- Only OOMWOO test_room single-target cancellations were checked in Gazebo.
-  Not a claim of full room cleaning, docking, dynamic keepout performance,
-  or measured swept-area completeness.
-- The next step requires a maintainer-approved job API and a trusted
-  clean-and-map measured coverage producer. A production adapter must
-  also implement safe backend goal reconciliation after a process restart.
-
-Developed using ChatGPT assistance, with Linux and official ROS2/Gazebo
-runtime testing. No other contributor's files or shared contracts changed.
+Apache-2.0. Developed with ChatGPT assistance and Linux/official OOMWOO
+ROS2/Gazebo tests. No other contributor path or shared architecture file
+is modified by this upstream pointer PR.
