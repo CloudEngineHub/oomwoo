@@ -1,58 +1,55 @@
-# Valdi320 — cleaning-jobs: measured coverage + completed Gazebo spot
+# Valdi320 — cleaning-jobs: measured small spots, offline rooms and virtual walls
 
-**Independent source:** https://github.com/Valdi320/oomwoo-cleaning-jobs
-**Validated commit:** https://github.com/Valdi320/oomwoo-cleaning-jobs/commit/e4d53fde549a794342a2a12fec84e171bb55c412
-**Reproducible Gazebo report:** https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/SMALL_SPOT_MEASURED_COMPLETION.md
-**Machine evidence (three runs):** https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/evidence/ros_verified_small_spot_repeats_20261027.json
+**Independent Apache-2.0 source:** https://github.com/Valdi320/oomwoo-cleaning-jobs
+**Verified version:** https://github.com/Valdi320/oomwoo-cleaning-jobs/commit/01fbc8078dfb57dd52c9ef71fbe501d8b53a7bcb
+**Measured completion:** https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/SMALL_SPOT_MEASURED_COMPLETION.md
+**Room/label workflow:** https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/ROOM_PARTITION_AND_RESTART.md
+**Offline virtual walls:** https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/VIRTUAL_WALLS_AND_ZONES.md
 
-Independent Apache-2.0 candidate for the
-[cleaning-jobs RFC](../README.md). Not a completed RFC or a
-production-ready physical vacuum/motor safety controller.
+Incremental independent candidate for OOMWOO's cleaning-jobs RFC.
+Not a completed RFC or production robot/motor safety system.
 
-### Delivered and tested
+### Tested features
 
-- Durable scope/recovery checkpoints, pause/resume/cancel and conservative
-  map/keepout-aware candidate routes (headless library).
-- Real ROS2 Jazzy NavigateToPose ActionClient + persistent **private**
-  experimental control node with Nav2 lifecycle and costmap safety gates.
-- Original **OOMWOO ground-truth Gazebo coverage meter**
-  (/coverage_meter/covered_grid plus /coverage_meter/sim_unstable)
-  connected to the checkpoint, not inferred from Nav2 arrival.
-- Bounded 3-second coverage confirmation tail after Nav2 terminal success:
-  accepts only independently measured new cells on matching source, map,
-  job and completed-goal token. Pause, cancel, new goal and expiry disarm.
-- Costmap-admitted routes through/beyond missed cells, avoiding repeated
-  stops just short of the cleaning area because of Nav2 goal tolerance.
-- Bounded retries with explicit COVERAGE_NO_PROGRESS pause, not infinite
-  motion or unverified cleaning credits.
+- Durable whole/room/spot cell-scope core, resource pauses and restart
+  checkpoints; the private long-running ROS2 experimental controller
+  currently supports **small spots**, not full rooms.
+- Real ROS2 Nav2 ActionClient with one active action, terminal-result
+  cancel barriers, lifecycle/costmap gates and fault-latched states.
+- Unmodified OOMWOO Gazebo ground-truth coverage meter connected
+  to the durable job. Bounded 3s confirmation tail accepts only
+  independent, source/map/token-scoped measured cells after a Nav2
+  success; never credits mere arrival.
+- Costmap-admitted through-and-beyond missing-cell targets; bounded
+  retry/no-progress behavior.
+- **3/3 cold Gazebo runs** completed the same nine-cell small spot
+  at 9/9 measured cells, two Nav2 goals each and confirmed terminal
+  cancellation. Not a whole-room or hardware result.
+- Offline deterministic room proposals, persisted human labels,
+  exact source-map fingerprint checks and room-only job states.
+- Offline polygon and virtual-wall raster mask candidates,
+  conservative clearance and persistent map-bound JSON.
+- **188 pure-Python tests PASS** and real ROS2 middleware tests.
+  Synthetic two-room workflow completes its selected room across a
+  battery pause and controller restart using test coverage events.
+- Read-only official /map checks: 12,394 safe test-room cells proposed
+  as one open area; offline polygon+virtual wall marked 116 cells
+  (11,761 safe cells after 5-cell inflation).
 
-### Evidence
+### Important limits / review request
 
-- **148/148** pure-Python tests, including fault injection and replay.
-- Full real ROS2 middleware action/status tests, including a synthetic
-  meter sample published AFTER a successful terminal Nav2 result.
-- **3/3 independent cold-started official OOMWOO Gazebo runs**: exactly
-  9/9 measured centre cells in a small test-room spot, two Nav2 goals
-  and terminal canceled result in every trial.
-- Another real-Gazebo run verified measured partial progress preserved
-  through synthetic battery-low pause and resume; not full spot cleanup.
-- The official Gazebo world does not publish real BatteryState; battery
-  tests use explicitly **synthetic** ROS2 telemetry. Coverage comes from
-  the original OOMWOO meter in the real Gazebo runs.
+- No public, maintainer-approved ROS2 cleaning-jobs action/status API.
+- Upstream Nav2 costmap parameters checked for the simulation do NOT
+  configure KeepoutFilter; this candidate mask is NOT an enforced
+  virtual wall and should not be used to drive physical hardware.
+- No integration yet with the existing oomwoo_coverage boustrophedon
+  whole-room executor, nor an operator zone editor / dock-cycle services.
+- No complete room cleaned in Gazebo or physical dirt removal proved.
+  Simulator BatteryState is explicitly synthetic in the relevant tests.
+- Crash-time reconciliation of unknown old Nav2 goals is still
+  fail-closed, not ready for automatic operation. No MCU safety tested.
 
-### Not yet complete
-
-The long-running private ROS2 test node currently handles one small spot.
-The production/public job action/service API, automatic room segmentation,
-editable/persisted Nav2 KeepoutFilter zones, upstream boustrophedon
-whole-room sweeping, dock-cycle coordination, safe crash-time outstanding
-goal reconciliation and full floor/multi-room regressions remain open.
-No physical MCU/motor safety validated.
-
-Maintainer review: please advise the normative ROS2 job contract and
-which upstream planner owns Nav2 goals; we should avoid two competing
-autonomous executors. A real robot needs its own actuator-state-gated
-coverage estimator, not Gazebo ground truth.
-
-Developed using ChatGPT assistance, reproducibly tested in the official
-OOMWOO ROS2 Jazzy/Gazebo image. Upstream PR changes only this pointer.
+Please advise the canonical job API, exclusive owner of Nav2 action
+goals, and how KeepoutFilter/mask servers and trusted coverage should
+be wired in the full integration. Upstream pointer changes ONLY this
+contributor path, not shared contracts.
