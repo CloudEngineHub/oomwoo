@@ -1,26 +1,30 @@
-# Valdi320 — cleaning-jobs checkpoints + Nav2 action interlock
+# Valdi320 — cleaning-jobs: durable jobs and ROS2/Nav2 cancel validation
 
-**Source:** [Valdi320/oomwoo-cleaning-jobs](https://github.com/Valdi320/oomwoo-cleaning-jobs)
-**Verified commit:** [a62de0c](https://github.com/Valdi320/oomwoo-cleaning-jobs/commit/a62de0cd77a08b7f21d5b5e8909856516983fc5f)
+**Source:** [Valdi320/oomwoo-cleaning-jobs](https://github.com/Valdi320/oomwoo-cleaning-jobs)  
+**Verified code:** [c84c181](https://github.com/Valdi320/oomwoo-cleaning-jobs/commit/c84c181da082e2cc44824c45f69462a6cda6b95e)  
+**Evidence:** [ROS2 / real Nav2 / Gazebo validation](https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/ROS2_GAZEBO_VALIDATION.md) · [machine-readable observations](https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/evidence/gazebo_nav2_20261027.json)
 
-**Scope:** a simulation-first, hardware-independent contribution for the
-[cleaning-jobs RFC](../README.md). A testable prototype, **not** a finished
-ROS2 package or a robot safety controller.
+Scope: one independently maintained, Apache-2.0 contribution for the
+[cleaning-jobs RFC](../README.md). This is not a completed RFC or production
+robot safety system.
 
 ### Implemented
 
-- Whole-map, manually defined room and spot target selection with unknown
-  cells/keepouts rejected and conservative grid clearance.
-- Crash-resistant coverage checkpoints: count only externally acknowledged
-  coverage, check saved map fingerprint, require a fresh pose after restart.
-- Pause/resume/cancel/status and battery, bin and mop-service interruptions.
-- **New: Nav2 action handoff interlock.** One active goal at most; request
-  cancellation on pause, service fault or recovery; wait for **terminal goal
-  result** before any new motion request. Old action results cannot unlock a
-  newer goal; uncertain transport and timeout remain blocked until external
-  backend-idle confirmation.
-- Design notes on asynchronous action handles, cancel-before-accept races and
-  reboot recovery: [navigation handoff contract](https://github.com/Valdi320/oomwoo-cleaning-jobs/blob/main/docs/NAVIGATION_HANDOFF.md).
+- Whole-map / manual rooms / spot selection; conservative grid clearance
+  and no-go cells; persistent progress checkpoint and resume validation.
+- Pause, resume, cancel, service pauses and explicit recovery states.
+- Real ROS2 Jazzy NavigateToPose ActionClient transport, including asynchronous
+  goal acceptance, cancel-before-accept race, real cancellation requests,
+  terminal-result gating and stale callback rejection.
+- Faults and cancel timeouts fail closed, requiring independent backend
+  idle verification before new navigation commands.
+- Three **actual Gazebo robot + real Nav2** tests in the upstream OOMWOO
+  test-room: user pause while moving, battery-low while moving, and cancel
+  before goal acceptance. All returned canceled and no second goal was sent.
+  Simulator odometry checked that movement settled after cancellation.
+- A real ROS2 middleware test against a safe ActionServer, plus pure-Python
+  deterministic fault-injection tests. No artificial cleaning credit for
+  merely reaching a navigation goal.
 
 ### Reproduce
 
@@ -31,23 +35,25 @@ PYTHONPATH=src python -m unittest discover -s tests -q
 PYTHONPATH=src python -m oomwoo_cleaning_jobs.demo
 ~~~
 
-**Evidence:** 67 deterministic tests passed (35 original, 32 interlock
-fault-injection tests), also passed with optimized Python execution and on an
-offline Python 3.12 container. GitHub Actions checks Python 3.10 and 3.12.
+**Evidence:** 92/92 pure-Python regressions passed; also checked inside the
+official ROS2 Jazzy image; ROS2 action server probe passed. The repo's
+ROS2_GAZEBO_VALIDATION.md includes reproducible isolated Podman commands and
+the exact image ID used for the three Gazebo results.
 
-### Still missing / review needed
+### Limitations / open architecture decisions
 
-- **No running Nav2 ActionClient or Gazebo integration yet.** The ROS2 adapter
-  must map tokens to actual Nav2 handles, deal with asynchronous acceptance,
-  verify terminal cancellation and independently clear old goals on restart.
-- This interlock gates new navigation commands but **does not physically stop
-  motors**. Never equate cancel-request delivery with a confirmed stop.
-  MCU-owned safety for bumper, cliff, wheel-drop and motor current is separate.
-- Advisory grid cell-centre routing does not prove footprint/keepout/collision
-  safety or actual swept coverage. Full costmap, sensor and localization
-  validation is required before hardware use.
-- Maintainer guidance requested for the cleaning-job action/service API and
-  the trusted clean-and-map coverage-producer interface.
+- This is a **real tested ActionClient transport and integration harness**,
+  not yet a persistent ROS2 cleaning-jobs node with the official
+  Start/Pause/Resume/Cancel/status service/action API.
+- No physical motors or MCU safety layer were tested. A successful Nav2 cancel
+  is not proof of a physical emergency stop; independent MCU bumper/cliff/
+  wheel-drop/current protections remain required.
+- Only OOMWOO test_room single-target cancellations were checked in Gazebo.
+  Not a claim of full room cleaning, docking, dynamic keepout performance,
+  or measured swept-area completeness.
+- The next step requires a maintainer-approved job API and a trusted
+  clean-and-map measured coverage producer. A production adapter must
+  also implement safe backend goal reconciliation after a process restart.
 
-Apache-2.0. Developed with ChatGPT assistance and subjected to local tests.
-No other contributors' paths, shared RFC or architecture files modified.
+Developed using ChatGPT assistance, with Linux and official ROS2/Gazebo
+runtime testing. No other contributor's files or shared contracts changed.
